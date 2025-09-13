@@ -965,32 +965,29 @@ function initializeSpotify() {
     
     try {
         // Check URL for callback parameters first
-        function checkSpotifyCallback() {
-            console.log('🔍 Checking for Spotify callback...');
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                
-                // Check for authorization code (Authorization Code Flow)
-                const code = urlParams.get('code');
-                const error = urlParams.get('error');
-                
-                if (error) {
-                    console.error('❌ Spotify authorization error:', error);
-                    const errorDescription = urlParams.get('error_description');
-                    showSpotifyError(`Authorization failed: ${errorDescription || error}`);
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    return;
-                }
-                
-                if (code) {
-                    console.log('🔑 Found authorization code, exchanging for token...');
-                    exchangeCodeForToken(code);
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-                
-            } catch (error) {
-                console.error('❌ Error checking Spotify callback:', error);
-            }
+        checkSpotifyCallback();
+        
+        // FIXED: Initialize UI elements with correct IDs
+        const loginBtn = document.getElementById('spotify-login');
+        const logoutBtn = document.getElementById('spotify-logout');
+        const retryBtn = document.getElementById('retry-spotify');
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', initiateSpotifyAuth);
+            console.log('✅ Spotify login button initialized');
+        } else {
+            console.error('❌ Spotify login button not found');
+        }
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', spotifyLogout);
+            console.log('✅ Spotify logout button initialized');
+        }
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                hideSpotifyError();
+                initiateSpotifyAuth();
+            });
+            console.log('✅ Spotify retry button initialized');
         }
         
         // Initialize player controls
