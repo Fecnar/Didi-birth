@@ -2225,18 +2225,15 @@ function nextSlide() {
     updateSlideshow();
 }
 
-// ENHANCED CALENDAR FUNCTIONS
+// COMPLETE CALENDAR JAVASCRIPT REPLACEMENT
 function initializeCalendar() {
-    console.log('📅 Initializing ENHANCED calendar...');
+    console.log('📅 Initializing COMPLETE calendar...');
     
     try {
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
         const addEventBtn = document.getElementById('add-event-btn');
         const eventModal = document.getElementById('event-modal');
-        const closeModal = document.getElementById('close-event-modal');
-        const cancelBtn = document.getElementById('cancel-event');
-        const eventForm = document.getElementById('event-form');
         
         if (prevMonthBtn) {
             prevMonthBtn.addEventListener('click', function(e) {
@@ -2259,45 +2256,11 @@ function initializeCalendar() {
             });
         }
         
-        if (closeModal && eventModal) {
-            closeModal.addEventListener('click', function(e) {
-                e.preventDefault();
-                closeEventModal();
-            });
-        }
-        
-        if (cancelBtn && eventModal) {
-            cancelBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                closeEventModal();
-            });
-        }
-        
-        if (eventForm) {
-            eventForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveEvent(e);
-            });
-        }
-        
-        if (eventModal) {
-            eventModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeEventModal();
-                }
-            });
-        }
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && eventModal && !eventModal.classList.contains('hidden')) {
-                e.preventDefault();
-                closeEventModal();
-            }
-        });
-        
+        // Initialize calendar display
         renderCalendar();
         updateEventsList();
         
+        // Add default birthday event if no events exist
         if (events.length === 0) {
             events.push({
                 id: Date.now(),
@@ -2312,7 +2275,7 @@ function initializeCalendar() {
             updateEventsList();
         }
         
-        console.log('✅ Enhanced Calendar initialized');
+        console.log('✅ Calendar initialized successfully');
     } catch (error) {
         console.error('❌ Error initializing calendar:', error);
     }
@@ -2322,13 +2285,20 @@ function renderCalendar() {
     const calendarGrid = document.getElementById('calendar-grid');
     const currentMonthElement = document.getElementById('current-month');
     
-    if (!calendarGrid || !currentMonthElement) return;
+    if (!calendarGrid || !currentMonthElement) {
+        console.error('❌ Calendar elements not found');
+        return;
+    }
     
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
-    currentMonthElement.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+    currentMonthElement.textContent = currentDate.toLocaleString('default', { 
+        month: 'long', 
+        year: 'numeric' 
+    });
     
+    // Clear previous content
     calendarGrid.innerHTML = '';
     
     // Add day headers
@@ -2346,6 +2316,7 @@ function renderCalendar() {
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
+    // Create 42 days (6 weeks)
     for (let i = 0; i < 42; i++) {
         const cellDate = new Date(startDate);
         cellDate.setDate(startDate.getDate() + i);
@@ -2353,6 +2324,7 @@ function renderCalendar() {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
         
+        // Add classes for styling
         if (cellDate.getMonth() !== month) {
             dayElement.classList.add('other-month');
         }
@@ -2361,373 +2333,251 @@ function renderCalendar() {
             dayElement.classList.add('today');
         }
         
-        dayElement.innerHTML = `
-            <div class="day-number">${cellDate.getDate()}</div>
-            <div class="day-events"></div>
-        `;
+        // Create day structure
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = cellDate.getDate();
         
+        const dayEvents = document.createElement('div');
+        dayEvents.className = 'day-events';
+        
+        dayElement.appendChild(dayNumber);
+        dayElement.appendChild(dayEvents);
+        
+        // Add click handler
         dayElement.addEventListener('click', function() {
             openEventModal(cellDate);
         });
         
         // Add events for this day
-        const dayEvents = events.filter(event => 
+        const eventsForDay = events.filter(event => 
             new Date(event.date).toDateString() === cellDate.toDateString()
         );
         
-        const eventsContainer = dayElement.querySelector('.day-events');
-        dayEvents.slice(0, 3).forEach(event => {
+        eventsForDay.slice(0, 3).forEach(event => {
             const eventElement = document.createElement('div');
             eventElement.className = 'event-indicator';
             eventElement.style.backgroundColor = event.color || '#FF6B9D';
-            eventElement.style.cursor = 'pointer';
-            eventElement.textContent = event.title.length > 15 ? event.title.substring(0, 15) + '...' : event.title;
-            eventElement.title = `${event.title}\n${event.time ? 'at ' + formatTime(event.time) : 'All day'}\nClick to edit or delete`;
+            eventElement.textContent = event.title.length > 12 ? 
+                event.title.substring(0, 12) + '...' : event.title;
+            eventElement.title = `${event.title}\n${event.time ? 'at ' + formatTime(event.time) : 'All day'}`;
             
-            // Click to edit event
             eventElement.addEventListener('click', function(e) {
                 e.stopPropagation();
                 openEventModal(null, event);
             });
             
-            eventsContainer.appendChild(eventElement);
+            dayEvents.appendChild(eventElement);
         });
         
-        if (dayEvents.length > 3) {
+        // Add "more" indicator if there are additional events
+        if (eventsForDay.length > 3) {
             const moreElement = document.createElement('div');
             moreElement.className = 'event-indicator more-events';
-            moreElement.style.backgroundColor = '#666';
-            moreElement.textContent = `+${dayEvents.length - 3} more`;
-            moreElement.style.cursor = 'pointer';
-            moreElement.title = 'Click to view all events for this day';
-            
-            moreElement.addEventListener('click', function(e) {
-                e.stopPropagation();
-                showDayEvents(cellDate, dayEvents);
-            });
-            
-            eventsContainer.appendChild(moreElement);
+            moreElement.textContent = `+${eventsForDay.length - 3} more`;
+            dayEvents.appendChild(moreElement);
         }
         
         calendarGrid.appendChild(dayElement);
     }
+    
+    console.log('✅ Calendar rendered successfully');
 }
 
-// Enhanced event modal with color picker and delete functionality
+function isToday(date) {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+    showNotification('📅 Previous month');
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+    showNotification('📅 Next month');
+}
+
 function openEventModal(date = null, existingEvent = null) {
     const modal = document.getElementById('event-modal');
-    const dateInput = document.getElementById('event-date');
-    const titleInput = document.getElementById('event-title');
-    const timeInput = document.getElementById('event-time');
-    const descriptionInput = document.getElementById('event-description');
-    
     if (!modal) return;
     
-    // Reset form
-    const eventForm = document.getElementById('event-form');
-    if (eventForm) {
-        eventForm.reset();
-    }
+    currentEventId = existingEvent ? existingEvent.id : null;
     
-    // Update modal content for enhanced features
-    const modalContent = modal.querySelector('.modal-content') || modal;
+    // Create modal content
+    const modalContent = modal.querySelector('.modal-content');
     modalContent.innerHTML = `
         <div class="modal-header">
-            <h2 id="event-modal-title">${existingEvent ? 'Edit Event' : 'Add New Event'}</h2>
-            <button type="button" id="close-event-modal" class="close-btn">×</button>
+            <h2>${existingEvent ? 'Edit Event' : 'Add New Event'}</h2>
+            <button type="button" class="close-btn" onclick="closeEventModal()">×</button>
         </div>
         
-        <form id="event-form" class="event-form">
+        <form class="event-form" onsubmit="saveEvent(event)">
             <div class="form-group">
                 <label for="event-title">Event Title *</label>
-                <input type="text" id="event-title" name="title" required placeholder="Enter event title..." maxlength="50">
+                <input type="text" id="event-title" required 
+                       value="${existingEvent ? existingEvent.title : ''}" 
+                       placeholder="Enter event title...">
             </div>
             
             <div class="form-row">
-                <div class="form-group half">
+                <div class="form-group">
                     <label for="event-date">Date *</label>
-                    <input type="date" id="event-date" name="date" required>
+                    <input type="date" id="event-date" required 
+                           value="${existingEvent ? existingEvent.date : (date ? date.toISOString().split('T')[0] : '')}">
                 </div>
-                <div class="form-group half">
+                <div class="form-group">
                     <label for="event-time">Time</label>
-                    <input type="time" id="event-time" name="time" placeholder="Optional">
+                    <input type="time" id="event-time" 
+                           value="${existingEvent ? existingEvent.time || '' : ''}">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="event-description">Description</label>
-                <textarea id="event-description" name="description" placeholder="Enter event description..." rows="3" maxlength="200"></textarea>
+                <textarea id="event-description" rows="3" 
+                          placeholder="Enter description...">${existingEvent ? existingEvent.description || '' : ''}</textarea>
             </div>
             
             <div class="form-row">
-                <div class="form-group half">
-                    <label for="event-color">Event Color</label>
-                    <div class="color-picker-group">
-                        <input type="color" id="event-color" name="color" value="#FF6B9D">
-                        <div class="color-presets">
-                            <button type="button" class="color-preset" data-color="#FF6B9D" style="background: #FF6B9D;" title="Pink"></button>
-                            <button type="button" class="color-preset" data-color="#4ECDC4" style="background: #4ECDC4;" title="Teal"></button>
-                            <button type="button" class="color-preset" data-color="#45B7D1" style="background: #45B7D1;" title="Blue"></button>
-                            <button type="button" class="color-preset" data-color="#96CEB4" style="background: #96CEB4;" title="Green"></button>
-                            <button type="button" class="color-preset" data-color="#FFEAA7" style="background: #FFEAA7;" title="Yellow"></button>
-                            <button type="button" class="color-preset" data-color="#DDA0DD" style="background: #DDA0DD;" title="Purple"></button>
-                            <button type="button" class="color-preset" data-color="#FFB347" style="background: #FFB347;" title="Orange"></button>
-                            <button type="button" class="color-preset" data-color="#FF6B6B" style="background: #FF6B6B;" title="Red"></button>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label for="event-color">Color</label>
+                    <input type="color" id="event-color" 
+                           value="${existingEvent ? existingEvent.color || '#FF6B9D' : '#FF6B9D'}">
                 </div>
-                <div class="form-group half">
+                <div class="form-group">
                     <label for="event-category">Category</label>
-                    <select id="event-category" name="category">
-                        <option value="general">General</option>
-                        <option value="birthday">Birthday</option>
-                        <option value="work">Work</option>
-                        <option value="personal">Personal</option>
-                        <option value="health">Health</option>
-                        <option value="social">Social</option>
-                        <option value="important">Important</option>
+                    <select id="event-category">
+                        <option value="general" ${existingEvent && existingEvent.category === 'general' ? 'selected' : ''}>General</option>
+                        <option value="birthday" ${existingEvent && existingEvent.category === 'birthday' ? 'selected' : ''}>Birthday</option>
+                        <option value="work" ${existingEvent && existingEvent.category === 'work' ? 'selected' : ''}>Work</option>
+                        <option value="personal" ${existingEvent && existingEvent.category === 'personal' ? 'selected' : ''}>Personal</option>
                     </select>
                 </div>
             </div>
             
             <div class="form-actions">
                 <div class="left-actions">
-                    ${existingEvent ? '<button type="button" id="delete-event" class="btn btn--danger">🗑️ Delete Event</button>' : ''}
+                    ${existingEvent ? '<button type="button" onclick="deleteEvent(' + existingEvent.id + ')" class="btn btn--danger">🗑️ Delete</button>' : ''}
                 </div>
                 <div class="right-actions">
-                    <button type="button" id="cancel-event" class="btn btn--outline">Cancel</button>
-                    <button type="submit" class="btn btn--primary">${existingEvent ? '💾 Update Event' : '➕ Add Event'}</button>
+                    <button type="button" onclick="closeEventModal()" class="btn btn--outline">Cancel</button>
+                    <button type="submit" class="btn btn--primary">${existingEvent ? 'Update' : 'Add'} Event</button>
                 </div>
             </div>
         </form>
     `;
     
-    // Populate form if editing existing event
-    if (existingEvent) {
-        currentEventId = existingEvent.id;
-        document.getElementById('event-title').value = existingEvent.title;
-        document.getElementById('event-date').value = existingEvent.date;
-        document.getElementById('event-time').value = existingEvent.time || '';
-        document.getElementById('event-description').value = existingEvent.description || '';
-        document.getElementById('event-color').value = existingEvent.color || '#FF6B9D';
-        document.getElementById('event-category').value = existingEvent.category || 'general';
-    } else {
-        currentEventId = null;
-        if (date && document.getElementById('event-date')) {
-            document.getElementById('event-date').value = date.toISOString().split('T')[0];
-        }
-    }
-    
-    // Add event listeners for new elements
-    setupEventModalListeners();
-    
     modal.classList.remove('hidden');
     
-    const titleInputField = document.getElementById('event-title');
-    if (titleInputField) {
-        setTimeout(() => titleInputField.focus(), 100);
-    }
+    // Focus on title input
+    setTimeout(() => {
+        const titleInput = document.getElementById('event-title');
+        if (titleInput) titleInput.focus();
+    }, 100);
 }
 
-function setupEventModalListeners() {
-    // Close modal
-    const closeBtn = document.getElementById('close-event-modal');
-    const cancelBtn = document.getElementById('cancel-event');
-    const deleteBtn = document.getElementById('delete-event');
-    const eventForm = document.getElementById('event-form');
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeEventModal);
-    }
-    
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', closeEventModal);
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-                deleteEvent(currentEventId);
-                closeEventModal();
-            }
-        });
-    }
-    
-    if (eventForm) {
-        eventForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveEvent(e);
-        });
-    }
-    
-    // Color preset buttons
-    const colorPresets = document.querySelectorAll('.color-preset');
-    const colorPicker = document.getElementById('event-color');
-    
-    colorPresets.forEach(preset => {
-        preset.addEventListener('click', function() {
-            const color = this.dataset.color;
-            if (colorPicker) {
-                colorPicker.value = color;
-            }
-            
-            // Update active state
-            colorPresets.forEach(p => p.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-    
-    // Update active preset when color picker changes
-    if (colorPicker) {
-        colorPicker.addEventListener('change', function() {
-            const selectedColor = this.value;
-            colorPresets.forEach(p => {
-                if (p.dataset.color.toLowerCase() === selectedColor.toLowerCase()) {
-                    p.classList.add('active');
-                } else {
-                    p.classList.remove('active');
-                }
-            });
-        });
-        
-        // Set initial active state
-        const initialColor = colorPicker.value;
-        colorPresets.forEach(p => {
-            if (p.dataset.color.toLowerCase() === initialColor.toLowerCase()) {
-                p.classList.add('active');
-            }
-        });
+function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    if (modal) {
+        modal.classList.add('hidden');
     }
 }
 
 function saveEvent(e) {
     e.preventDefault();
     
-    try {
-        const titleEl = document.getElementById('event-title');
-        const dateEl = document.getElementById('event-date');
-        const timeEl = document.getElementById('event-time');
-        const descriptionEl = document.getElementById('event-description');
-        const colorEl = document.getElementById('event-color');
-        const categoryEl = document.getElementById('event-category');
-        
-        if (!titleEl || !dateEl || !titleEl.value.trim() || !dateEl.value) {
-            showNotification('❌ Please fill in the title and date fields');
-            return;
-        }
-        
-        const event = {
-            id: currentEventId || Date.now(),
-            title: titleEl.value.trim(),
-            date: dateEl.value,
-            time: timeEl ? timeEl.value : '',
-            description: descriptionEl ? descriptionEl.value.trim() : '',
-            color: colorEl ? colorEl.value : '#FF6B9D',
-            category: categoryEl ? categoryEl.value : 'general',
-            createdAt: currentEventId ? events.find(e => e.id === currentEventId)?.createdAt : new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        
-        if (currentEventId) {
-            const index = events.findIndex(e => e.id === currentEventId);
-            if (index !== -1) {
-                events[index] = event;
-                showNotification('✅ Event updated successfully!');
-            }
-        } else {
-            events.push(event);
-            showNotification('🎉 Event added successfully!');
-        }
-        
-        saveCalendarData();
-        renderCalendar();
-        updateEventsList();
-        closeEventModal();
-        
-    } catch (error) {
-        console.error('❌ Error saving event:', error);
-        showNotification('❌ Error saving event. Please try again.');
+    const title = document.getElementById('event-title').value.trim();
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const description = document.getElementById('event-description').value.trim();
+    const color = document.getElementById('event-color').value;
+    const category = document.getElementById('event-category').value;
+    
+    if (!title || !date) {
+        showNotification('❌ Please fill in title and date');
+        return;
     }
+    
+    const event = {
+        id: currentEventId || Date.now(),
+        title,
+        date,
+        time,
+        description,
+        color,
+        category,
+        createdAt: currentEventId ? events.find(e => e.id === currentEventId)?.createdAt : new Date().toISOString()
+    };
+    
+    if (currentEventId) {
+        const index = events.findIndex(e => e.id === currentEventId);
+        if (index !== -1) {
+            events[index] = event;
+            showNotification('✅ Event updated!');
+        }
+    } else {
+        events.push(event);
+        showNotification('🎉 Event added!');
+    }
+    
+    saveCalendarData();
+    renderCalendar();
+    updateEventsList();
+    closeEventModal();
 }
 
 function deleteEvent(eventId) {
-    try {
-        const eventIndex = events.findIndex(e => e.id === eventId);
-        if (eventIndex !== -1) {
-            const eventTitle = events[eventIndex].title;
-            events.splice(eventIndex, 1);
+    if (confirm('Are you sure you want to delete this event?')) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index !== -1) {
+            events.splice(index, 1);
             saveCalendarData();
             renderCalendar();
             updateEventsList();
-            showNotification(`🗑️ Event "${eventTitle}" deleted successfully`);
+            closeEventModal();
+            showNotification('🗑️ Event deleted');
         }
-    } catch (error) {
-        console.error('❌ Error deleting event:', error);
-        showNotification('❌ Error deleting event');
     }
 }
 
-function showDayEvents(date, dayEvents) {
-    const dateStr = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
+function updateEventsList() {
+    const eventsList = document.getElementById('events-list');
+    if (!eventsList) return;
     
-    const eventsHtml = dayEvents.map(event => `
-        <div class="day-event-item" style="border-left: 4px solid ${event.color};">
-            <div class="event-item-header">
-                <h4>${event.title}</h4>
-                <div class="event-actions">
-                    <button onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '&quot;')})" class="btn-small btn--primary">✏️ Edit</button>
-                    <button onclick="deleteEvent(${event.id})" class="btn-small btn--danger">🗑️ Delete</button>
+    const today = new Date();
+    const upcomingEvents = events
+        .filter(event => new Date(event.date) >= today)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 5);
+    
+    if (upcomingEvents.length === 0) {
+        eventsList.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No upcoming events</p>';
+        return;
+    }
+    
+    eventsList.innerHTML = upcomingEvents.map(event => {
+        const eventDate = new Date(event.date);
+        const dateStr = eventDate.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        return `
+            <div class="event-item" onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '&quot;')})" 
+                 style="border-left-color: ${event.color};">
+                <div class="event-header">
+                    <div class="event-title">${getCategoryIcon(event.category)} ${event.title}</div>
                 </div>
+                <div class="event-datetime">${dateStr}${event.time ? ' at ' + formatTime(event.time) : ''}</div>
+                ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
             </div>
-            <div class="event-time">${event.time ? formatTime(event.time) : 'All day'}</div>
-            ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
-            <div class="event-category">${getCategoryIcon(event.category)} ${event.category}</div>
-        </div>
-    `).join('');
-    
-    const modal = document.createElement('div');
-    modal.className = 'day-events-modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>📅 Events for ${dateStr}</h2>
-                <button type="button" class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
-            </div>
-            <div class="day-events-list">
-                ${eventsHtml}
-            </div>
-            <div class="modal-actions">
-                <button onclick="openEventModal(new Date('${date.toISOString()}'))" class="btn btn--primary">➕ Add Event for This Day</button>
-            </div>
-        </div>
-    `;
-    
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(modal);
-    
-    modal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.remove();
-        }
-    });
+        `;
+    }).join('');
 }
 
 function getCategoryIcon(category) {
@@ -2743,135 +2593,6 @@ function getCategoryIcon(category) {
     return icons[category] || '📅';
 }
 
-function updateEventsList() {
-    const eventsList = document.getElementById('events-list');
-    if (!eventsList) return;
-    
-    const today = new Date();
-    const sortedEvents = events
-        .filter(event => new Date(event.date + ' ' + (event.time || '00:00')) >= today)
-        .sort((a, b) => new Date(a.date + ' ' + (a.time || '00:00')) - new Date(b.date + ' ' + (b.time || '00:00')))
-        .slice(0, 5);
-    
-    if (sortedEvents.length === 0) {
-        eventsList.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); font-style: italic; padding: 16px;">No upcoming events</p>';
-        return;
-    }
-    
-    eventsList.innerHTML = '';
-    sortedEvents.forEach(event => {
-        const eventElement = document.createElement('div');
-        eventElement.className = 'event-item enhanced';
-        eventElement.style.borderLeftColor = event.color;
-        eventElement.style.cursor = 'pointer';
-        
-        const eventDate = new Date(event.date);
-        const dateStr = eventDate.toLocaleDateString('en-US', { 
-            weekday: 'short', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-        
-        eventElement.innerHTML = `
-            <div class="event-header">
-                <div class="event-title">${getCategoryIcon(event.category)} ${event.title}</div>
-                <div class="event-actions-mini">
-                    <button onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '&quot;')})" class="btn-tiny">✏️</button>
-                </div>
-            </div>
-            <div class="event-datetime">${dateStr}${event.time ? ' at ' + formatTime(event.time) : ''}</div>
-            ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
-        `;
-        
-        eventElement.addEventListener('click', function() {
-            openEventModal(null, event);
-        });
-        
-        eventsList.appendChild(eventElement);
-    });
-}
-
-function saveGalleryData() {
-    try {
-        localStorage.setItem('chutadamon_photos', JSON.stringify(photos));
-        console.log('💾 Gallery data saved');
-    } catch (error) {
-        console.error('❌ Error saving gallery data:', error);
-    }
-}
-
-function saveCalendarData() {
-    try {
-        localStorage.setItem('chutadamon_events', JSON.stringify(events));
-        console.log('💾 Calendar data saved');
-    } catch (error) {
-        console.error('❌ Error saving calendar data:', error);
-    }
-}
-
-function loadSavedData() {
-    console.log('💾 Loading saved data...');
-    
-    try {
-        // Load reminders
-        const savedReminders = localStorage.getItem('chutadamon_reminders');
-        if (savedReminders) {
-            const remindersData = JSON.parse(savedReminders);
-            
-            // Load meal settings
-            Object.entries(remindersData.meals || {}).forEach(([mealType, mealData]) => {
-                const toggle = document.getElementById(`${mealType}-toggle`);
-                const timeSelect = document.getElementById(`${mealType}-time`);
-                
-                if (toggle) toggle.checked = mealData.enabled;
-                if (timeSelect) timeSelect.value = mealData.time;
-                
-                // Schedule if enabled and permission granted
-                if (mealData.enabled && notificationPermission === 'granted') {
-                    setTimeout(() => {
-                        scheduleMealReminder(mealType, mealData.time);
-                    }, 1000);
-                }
-            });
-            
-            // Load water settings
-            if (remindersData.water) {
-                const waterToggle = document.getElementById('water-toggle');
-                const intervalSelect = document.getElementById('water-interval-select');
-                
-                if (waterToggle) waterToggle.checked = remindersData.water.enabled;
-                if (intervalSelect) intervalSelect.value = remindersData.water.interval;
-                
-                waterProgress = remindersData.water.progress || 0;
-                updateWaterProgress();
-                
-                // Schedule if enabled and permission granted
-                if (remindersData.water.enabled && notificationPermission === 'granted') {
-                    setTimeout(() => {
-                        scheduleWaterReminder(remindersData.water.interval);
-                    }, 1000);
-                }
-            }
-        }
-        
-        // Load photos
-        const savedPhotos = localStorage.getItem('chutadamon_photos');
-        if (savedPhotos) {
-            photos = JSON.parse(savedPhotos);
-            updateGalleryDisplay();
-        }
-        
-        // Load events
-        const savedEvents = localStorage.getItem('chutadamon_events');
-        if (savedEvents) {
-            events = JSON.parse(savedEvents);
-        }
-        
-        console.log('✅ Data loading complete!');
-    } catch (error) {
-        console.error('❌ Error loading saved data:', error);
-    }
-}
 
 // FIXED: Continuous Auto-Playing Slideshow
 let isSlideShowRunning = false;
