@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Chutadamon! 🎉</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-toggle-icon">🌙</span>
+    </button>
+
+    <!-- Mobile Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>Chutadamon's Birthday Space ✨</h2>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </button>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">🏠 Home</a>
+                <a href="#reminders" class="nav-link">⏰ Reminders</a>
+                <a href="#gallery" class="nav-link">📸 Gallery</a>
+                <a href="#spotify" class="nav-link">🎵 Music</a>
+                <a href="#calendar" class="nav-link">📅 Calendar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Decorations -->
+    <div class="floating-decorations">
+        <div class="balloon balloon-1">🎈</div>
+        <div class="balloon balloon-2">🎈</div>
+        <div class="balloon balloon-3">🎈</div>
+        <div class="balloon balloon-4">🎈</div>
+        <div class="confetti confetti-1">✨</div>
+        <div class="confetti confetti-2">🎊</div>
+        <div class="confetti confetti-3">✨</div>
+        <div class="confetti confetti-4">🎊</div>
+    </div>
+
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="container">
+                <div class="home-content">
+                    <div class="birthday-header">
+                        <h1 class="birthday-title">Happy Birthday</h1>
+                        <h2 class="birthday-name">Chutadamon! 🎂</h2>
+                        <p class="birthday-subtitle">Today is your special day! 🌟</p>
+                    </div>
+                    
+                    <div class="birthday-gif">
+                        <div class="gif-frame">
+                            <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWQzc2pwMW5xcjNqeHR0bGJ2eDBqdmpvZHpnYzQ3MnhmMzlzOGd3aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9rO5Aksmn0dHQKXJAu/giphy.gif" alt="Happy Birthday GIF" />
+                        </div>
+                    </div>
+
+                    <div class="counters">
+                        <div class="card countdown-card">
+                            <div class="card-header">
+                                <h3 id="countdown-title">🎉 It's Your Birthday Today!</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="countdown" class="countdown-display">
+                                    <div class="time-unit">
+                                        <span id="days">365</span>
+                                        <label>Days Until Next</label>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="hours">0</span>
+                                        <label>Hours</label>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="minutes">0</span>
+                                        <label>Minutes</label>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="seconds">0</span>
+                                        <label>Seconds</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card sister-card">
+                            <div class="card-header">
+                                <h3>💕 Best Sister Since</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="sister-counter">
+                                    <span id="sister-days">7308</span>
+                                    <label>Amazing Days</label>
+                                </div>
+                                <p class="sister-date">October 5, 2005 🌟</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reminders Section -->
+        <section id="reminders" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">🍽️ Food & Water Reminders</h2>
+                    <p class="section-subtitle">Stay healthy and hydrated! 💪</p>
+                </div>
+                
+                <div class="reminders-grid">
+                    <div class="card meal-reminders">
+                        <div class="card-header">
+                            <h3>🍳 Meal Reminders</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="meal-list" id="meal-list">
+                                <div class="meal-item" data-meal="breakfast">
+                                    <div class="meal-header">
+                                        <div class="meal-icon">🍳</div>
+                                        <div class="meal-info">
+                                            <span class="meal-name">Breakfast</span>
+                                            <span class="meal-description">Start your day right!</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="breakfast-toggle">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <select id="breakfast-time" class="form-control meal-time">
+                                        <option value="06:00">6:00 AM</option>
+                                        <option value="06:30">6:30 AM</option>
+                                        <option value="07:00">7:00 AM</option>
+                                        <option value="07:30">7:30 AM</option>
+                                        <option value="08:00" selected>8:00 AM</option>
+                                        <option value="08:30">8:30 AM</option>
+                                        <option value="09:00">9:00 AM</option>
+                                    </select>
+                                </div>
+
+                                <div class="meal-item" data-meal="lunch">
+                                    <div class="meal-header">
+                                        <div class="meal-icon">🥗</div>
+                                        <div class="meal-info">
+                                            <span class="meal-name">Lunch</span>
+                                            <span class="meal-description">Fuel your afternoon!</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="lunch-toggle">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <select id="lunch-time" class="form-control meal-time">
+                                        <option value="12:00">12:00 PM</option>
+                                        <option value="12:30">12:30 PM</option>
+                                        <option value="13:00" selected>1:00 PM</option>
+                                        <option value="13:30">1:30 PM</option>
+                                        <option value="14:00">2:00 PM</option>
+                                    </select>
+                                </div>
+
+                                <div class="meal-item" data-meal="dinner">
+                                    <div class="meal-header">
+                                        <div class="meal-icon">🍽️</div>
+                                        <div class="meal-info">
+                                            <span class="meal-name">Dinner</span>
+                                            <span class="meal-description">End the day well!</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="dinner-toggle">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <select id="dinner-time" class="form-control meal-time">
+                                        <option value="18:00">6:00 PM</option>
+                                        <option value="18:30">6:30 PM</option>
+                                        <option value="19:00" selected>7:00 PM</option>
+                                        <option value="19:30">7:30 PM</option>
+                                        <option value="20:00">8:00 PM</option>
+                                    </select>
+                                </div>
+
+                                <div class="meal-item" data-meal="snack">
+                                    <div class="meal-header">
+                                        <div class="meal-icon">🍎</div>
+                                        <div class="meal-info">
+                                            <span class="meal-name">Snack</span>
+                                            <span class="meal-description">Healthy treats!</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="snack-toggle">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <select id="snack-time" class="form-control meal-time">
+                                        <option value="15:00">3:00 PM</option>
+                                        <option value="15:30" selected>3:30 PM</option>
+                                        <option value="16:00">4:00 PM</option>
+                                        <option value="16:30">4:30 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="custom-meal-section">
+                                <button class="btn btn--secondary" id="add-custom-meal">+ Add Custom Meal</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card water-reminders">
+                        <div class="card-header">
+                            <h3>💧 Water Reminders</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="water-controls">
+                                <div class="water-toggle">
+                                    <div class="water-info">
+                                        <span class="water-label">Enable Water Reminders</span>
+                                        <span class="water-description">Stay hydrated! 💦</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="water-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="water-interval">
+                                    <label for="water-interval-select" class="form-label">Reminder Interval</label>
+                                    <select id="water-interval-select" class="form-control">
+                                        <option value="15">Every 15 minutes</option>
+                                        <option value="30">Every 30 minutes</option>
+                                        <option value="60" selected>Every 1 hour</option>
+                                        <option value="120">Every 2 hours</option>
+                                        <option value="180">Every 3 hours</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="water-stats">
+                                    <div class="water-progress">
+                                        <div class="progress-circle">
+                                            <svg class="progress-ring" width="80" height="80">
+                                                <circle class="progress-ring-circle" stroke="currentColor" stroke-width="4" fill="transparent" r="36" cx="40" cy="40"/>
+                                            </svg>
+                                            <div class="progress-text">0%</div>
+                                        </div>
+                                        <span class="progress-label">Daily Goal</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">📸 Photo Gallery</h2>
+                    <p class="section-subtitle">Beautiful memories captured! ✨</p>
+                </div>
+                
+                <div class="gallery-controls">
+                    <input type="file" id="photo-upload" accept="image/*" multiple style="display: none;">
+                    <button class="btn btn--primary" id="upload-btn">📷 Upload Photos</button>
+                    <button class="btn btn--secondary" id="slideshow-btn">🎬 Start Slideshow</button>
+                </div>
+
+                <div class="gallery-grid" id="gallery-grid">
+                    <div class="empty-gallery">
+                        <div class="empty-icon">📸</div>
+                        <h3>No photos yet</h3>
+                        <p>Upload some beautiful memories to get started!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slideshow Modal -->
+        <div class="modal hidden" id="slideshow-modal">
+            <div class="modal-content slideshow-content">
+                <button class="modal-close" id="close-slideshow">&times;</button>
+                <div class="slideshow-container">
+                    <button class="slideshow-btn prev-btn" id="prev-slide">❮</button>
+                    <img id="slideshow-image" src="" alt="Slideshow Image">
+                    <button class="slideshow-btn next-btn" id="next-slide">❯</button>
+                </div>
+                <div class="slideshow-counter">
+                    <span id="slide-counter">1 / 1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Spotify Section -->
+        <section id="spotify" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">🎵 Your Music Experience</h2>
+                    <p class="section-subtitle">Connect Spotify for the ultimate birthday soundtrack! 🎶</p>
+                </div>
+                
+                <!-- Spotify Authentication -->
+                <div class="spotify-auth-section" id="spotify-auth-section">
+                    <div class="card spotify-auth-card">
+                        <div class="card-body">
+                            <div class="spotify-login-content">
+                                <div class="spotify-logo">
+                                    <div class="spotify-icon">🎵</div>
+                                </div>
+                                <h3>Connect with Spotify</h3>
+                                <p>Get full access to your playlists, liked songs, and playback controls!</p>
+                                <ul class="spotify-features">
+                                    <li>🎵 Access all your playlists</li>
+                                    <li>💚 Browse your liked songs</li>
+                                    <li>🎮 Full playback control</li>
+                                    <li>🔀 Shuffle and repeat modes</li>
+                                    <li>📱 Mobile-friendly experience</li>
+                                </ul>
+                                <button class="btn btn--primary btn--lg" id="spotify-login-btn">
+                                    <span class="spotify-btn-icon">🎧</span>
+                                    Login with Spotify
+                                </button>
+                                <p class="spotify-note">Note: Spotify Premium required for full playback control</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Profile Section -->
+                <div class="spotify-profile-section hidden" id="spotify-profile-section">
+                    <div class="card spotify-profile-card">
+                        <div class="card-body">
+                            <div class="spotify-profile">
+                                <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                                <div class="user-info">
+                                    <h3 id="user-name">-</h3>
+                                    <p id="user-email">-</p>
+                                    <div class="user-stats">
+                                        <span id="user-followers">0 followers</span>
+                                        <span class="separator">•</span>
+                                        <span id="user-country">-</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn--outline" id="spotify-logout-btn">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Music Interface -->
+                <div class="spotify-main-section hidden" id="spotify-main-section">
+                    <!-- Current Player -->
+                    <div class="card current-player-card">
+                        <div class="card-header">
+                            <h3>🎵 Now Playing</h3>
+                            <div class="player-status">
+                                <span id="player-status">Ready to play</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="current-player">
+                                <div class="track-artwork">
+                                    <img id="current-track-image" src="" alt="Track Artwork" class="track-image">
+                                    <div class="track-overlay">
+                                        <div class="visualizer" id="music-visualizer">
+                                            <div class="bar"></div>
+                                            <div class="bar"></div>
+                                            <div class="bar"></div>
+                                            <div class="bar"></div>
+                                            <div class="bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="track-info">
+                                    <h4 id="current-track-name">Select a track to play</h4>
+                                    <p id="current-track-artist">-</p>
+                                    <p id="current-track-album">-</p>
+                                </div>
+
+                                <div class="player-controls">
+                                    <div class="main-controls">
+                                        <button class="control-btn" id="shuffle-btn" title="Shuffle">🔀</button>
+                                        <button class="control-btn" id="prev-btn" title="Previous">⏮️</button>
+                                        <button class="control-btn play-btn" id="play-pause-btn" title="Play/Pause">▶️</button>
+                                        <button class="control-btn" id="next-btn" title="Next">⏭️</button>
+                                        <button class="control-btn" id="repeat-btn" title="Repeat">🔁</button>
+                                    </div>
+
+                                    <div class="progress-section">
+                                        <span id="current-time">0:00</span>
+                                        <div class="progress-bar" id="progress-bar">
+                                            <div class="progress-fill" id="progress-fill"></div>
+                                            <div class="progress-handle" id="progress-handle"></div>
+                                        </div>
+                                        <span id="total-time">0:00</span>
+                                    </div>
+
+                                    <div class="volume-section">
+                                        <span class="volume-icon">🔊</span>
+                                        <div class="volume-bar" id="volume-bar">
+                                            <div class="volume-fill" id="volume-fill"></div>
+                                            <div class="volume-handle" id="volume-handle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Tabs -->
+                    <div class="spotify-tabs">
+                        <button class="tab-btn active" data-tab="playlists">🎵 Playlists</button>
+                        <button class="tab-btn" data-tab="liked-songs">💚 Liked Songs</button>
+                        <button class="tab-btn" data-tab="queue">📋 Queue</button>
+                    </div>
+
+                    <!-- Playlists Tab -->
+                    <div class="tab-content active" id="playlists-tab">
+                        <div class="card playlists-card">
+                            <div class="card-header">
+                                <h3>🎵 Your Playlists</h3>
+                                <div class="search-container">
+                                    <input type="text" id="playlist-search" class="form-control search-input" placeholder="Search playlists...">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="loading-state" id="playlists-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading your playlists...</p>
+                                </div>
+                                <div class="playlists-grid" id="playlists-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liked Songs Tab -->
+                    <div class="tab-content" id="liked-songs-tab">
+                        <div class="card liked-songs-card">
+                            <div class="card-header">
+                                <h3>💚 Your Liked Songs</h3>
+                                <div class="search-container">
+                                    <input type="text" id="liked-songs-search" class="form-control search-input" placeholder="Search liked songs...">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="loading-state" id="liked-songs-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading your liked songs...</p>
+                                </div>
+                                <div class="liked-songs-list" id="liked-songs-list"></div>
+                                <div class="pagination-controls" id="liked-songs-pagination">
+                                    <button class="btn btn--outline" id="prev-liked-page" disabled>Previous</button>
+                                    <span id="liked-page-info">Page 1</span>
+                                    <button class="btn btn--outline" id="next-liked-page">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Queue Tab -->
+                    <div class="tab-content" id="queue-tab">
+                        <div class="card queue-card">
+                            <div class="card-header">
+                                <h3>📋 Playback Queue</h3>
+                                <button class="btn btn--outline" id="clear-queue-btn">Clear Queue</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="queue-list" id="queue-list">
+                                    <div class="empty-queue">
+                                        <div class="empty-icon">📋</div>
+                                        <h4>Queue is empty</h4>
+                                        <p>Play some tracks to see them here!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Messages -->
+                <div class="spotify-error hidden" id="spotify-error">
+                    <div class="card error-card">
+                        <div class="card-body">
+                            <div class="error-content">
+                                <div class="error-icon">⚠️</div>
+                                <h3 id="error-title">Connection Error</h3>
+                                <p id="error-message">Unable to connect to Spotify. Please try again.</p>
+                                <button class="btn btn--primary" id="retry-connection-btn">Retry Connection</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Playlist Details Modal -->
+        <div class="modal hidden" id="playlist-modal">
+            <div class="modal-content playlist-modal-content">
+                <div class="modal-header">
+                    <h3 id="playlist-modal-title">Playlist</h3>
+                    <button class="modal-close" id="close-playlist-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="playlist-details">
+                        <div class="playlist-info">
+                            <img id="playlist-modal-image" src="" alt="Playlist Cover" class="playlist-cover">
+                            <div class="playlist-meta">
+                                <h4 id="playlist-modal-name">-</h4>
+                                <p id="playlist-modal-description">-</p>
+                                <div class="playlist-stats">
+                                    <span id="playlist-modal-tracks">0 tracks</span>
+                                    <span class="separator">•</span>
+                                    <span id="playlist-modal-owner">-</span>
+                                </div>
+                                <button class="btn btn--primary" id="play-playlist-btn">🎵 Play Playlist</button>
+                            </div>
+                        </div>
+                        <div class="playlist-tracks">
+                            <div class="loading-state" id="playlist-tracks-loading">
+                                <div class="loading-spinner"></div>
+                                <p>Loading tracks...</p>
+                            </div>
+                            <div class="tracks-list" id="playlist-tracks-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <section id="calendar" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">📅 Personal Calendar</h2>
+                    <p class="section-subtitle">Plan your celebrations! 🎉</p>
+                </div>
+                
+                <div class="calendar-wrapper">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button class="btn btn--outline calendar-nav-btn" id="prev-month">❮</button>
+                            <h3 id="current-month">September 2025</h3>
+                            <button class="btn btn--outline calendar-nav-btn" id="next-month">❯</button>
+                        </div>
+                        
+                        <div class="calendar-grid" id="calendar-grid">
+                            <!-- Calendar will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="events-sidebar">
+                        <div class="card events-card">
+                            <div class="card-header">
+                                <h3>🎊 Upcoming Events</h3>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn--primary btn--full-width" id="add-event-btn">+ Add Event</button>
+                                <div class="events-list" id="events-list">
+                                    <!-- Events will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Modal -->
+        <div class="modal hidden" id="event-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="event-modal-title">Add New Event</h3>
+                    <button class="modal-close" id="close-event-modal">&times;</button>
+                </div>
+                <form id="event-form">
+                    <div class="form-group">
+                        <label for="event-title" class="form-label">Event Title</label>
+                        <input type="text" id="event-title" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="event-date" class="form-label">Date</label>
+                        <input type="date" id="event-date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="event-time" class="form-label">Time</label>
+                        <input type="time" id="event-time" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="event-description" class="form-label">Description</label>
+                        <textarea id="event-description" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Event Category</label>
+                        <div class="color-picker" id="color-picker">
+                            <!-- Color options will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--outline" id="cancel-event">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Save Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
