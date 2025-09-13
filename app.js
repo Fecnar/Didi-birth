@@ -75,13 +75,24 @@ let currentVolume = 0.5;
 let notificationPermission = 'default';
 let notificationSupported = 'Notification' in window;
 
-// FIXED: Define Spotify Web Playback SDK callback globally
-window.onSpotifyWebPlaybackSDKReady = () => {
-    console.log('🎧 Spotify Web Playback SDK is ready');
-    if (spotifyAccessToken) {
-        setupSpotifyPlayer();
-    }
-};
+// FIXED: Define Spotify Web Playback SDK callback globally with better error handling
+if (typeof window !== 'undefined') {
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        console.log('🎧 Spotify Web Playback SDK is ready');
+        if (spotifyAccessToken) {
+            setupSpotifyPlayer();
+        }
+    };
+    
+    // Fallback in case the callback doesn't fire
+    setTimeout(() => {
+        if (window.Spotify && window.Spotify.Player && spotifyAccessToken && !spotifyPlayer) {
+            console.log('🎧 SDK ready via fallback, setting up player...');
+            setupSpotifyPlayer();
+        }
+    }, 2000);
+}
+
 
 // FIXED: Initialize the application when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -2644,7 +2655,6 @@ function loadSavedData() {
 // FIXED: Continuous Auto-Playing Slideshow
 let isSlideShowRunning = false;
 let slideShowInterval = null;
-let currentSlideIndex = 0;
 
 function startContinuousSlideshow() {
     console.log('🎬 Starting continuous slideshow...');
