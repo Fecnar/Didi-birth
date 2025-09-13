@@ -13,7 +13,7 @@ const appData = {
     spotifyConfig: {
         clientId: "47314cafb560479590dbd910f412e561",
         // FIXED: Use window.location.origin for proper redirect URI
-        redirectUri: window.location.origin,
+        redirectUri: "https://happybirthdaydidi.pages.dev/",
         scopes: [
             "user-read-private",
             "user-read-email", 
