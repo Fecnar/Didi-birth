@@ -219,7 +219,7 @@ function showAddToHomeInstructions() {
         instructions = 'Check your browser menu for "Add to Home Screen" or "Install App" option';
     }
     
-    showNotification(`📱 Add to Home Screen\n\n${instructions}\n\nThis will create a shortcut to Chutadamon's Birthday Website on your device!`);
+    alert(`📱 Add to Home Screen\n\n${instructions}\n\nThis will create a shortcut to Chutadamon's Birthday Website on your device!`);
 }
 
 // Listen for successful app installation
@@ -348,100 +348,6 @@ function showNotificationBanner() {
     }
 }
 
-// HAMBURGER MENU JAVASCRIPT - COMPLETE FIX
-function initializeNavigation() {
-    console.log('🧭 Initializing navigation...');
-    
-    try {
-        const navToggle = document.getElementById('nav-toggle');
-        const navMenu = document.getElementById('nav-menu');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        console.log('Navigation elements found:', {
-            navToggle: !!navToggle,
-            navMenu: !!navMenu,
-            navLinks: navLinks.length
-        });
-
-        // FIXED: Mobile menu toggle
-        if (navToggle && navMenu) {
-            navToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('📱 Nav toggle clicked');
-                
-                // Toggle active classes
-                navMenu.classList.toggle('active');
-                navToggle.classList.toggle('active');
-                
-                // Log current state
-                console.log('Menu active:', navMenu.classList.contains('active'));
-                
-                // Add haptic feedback on mobile
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-            });
-            console.log('✅ Mobile menu toggle initialized');
-        } else {
-            console.error('❌ Nav toggle or nav menu not found!', {
-                navToggle: navToggle,
-                navMenu: navMenu
-            });
-        }
-
-        // Navigation links
-        if (navLinks.length > 0) {
-            navLinks.forEach((link, index) => {
-                link.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    console.log(`🔗 Nav link ${index} clicked:`, href);
-                    
-                    // Don't prevent default for Add to Home button
-                    if (this.id === 'add-to-home') {
-                        return; // Let the add-to-home handler deal with this
-                    }
-                    
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (href && href.startsWith('#')) {
-                        const targetId = href.substring(1);
-                        console.log('🎯 Switching to section:', targetId);
-                        
-                        const success = switchSection(targetId);
-                        
-                        if (success) {
-                            // Update active state
-                            navLinks.forEach(l => l.classList.remove('active'));
-                            this.classList.add('active');
-                            
-                            // Close mobile menu
-                            if (navMenu) navMenu.classList.remove('active');
-                            if (navToggle) navToggle.classList.remove('active');
-                            
-                            showNotification(`📱 Navigated to ${targetId.charAt(0).toUpperCase() + targetId.slice(1)}`);
-                        }
-                    }
-                });
-            });
-            console.log('✅ Navigation links initialized:', navLinks.length);
-        }
-        
-        console.log('✅ Navigation completely initialized');
-    } catch (error) {
-        console.error('❌ Error initializing navigation:', error);
-    }
-}
-
-// Make sure this runs on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // ... your other initialization code ...
-    initializeNavigation(); // Make sure this is called
-    // ... rest of your code ...
-});
-
-
 function hideNotificationBanner() {
     const banner = document.getElementById('notification-banner');
     if (banner) {
@@ -473,8 +379,8 @@ async function requestNotificationPermission() {
             setTimeout(() => {
                 new Notification('🎉 Notifications Working!', {
                     body: 'You\'ll now receive reminders at the scheduled times.',
-                    icon: '/icon-192.png',
-                    badge: '/icon-192.png'
+                    icon: '/icon-192x192.png',
+                    badge: '/icon-192x192.png'
                 });
             }, 1000);
             
@@ -497,8 +403,8 @@ function testNotification() {
     if (notificationPermission === 'granted') {
         new Notification('🧪 Test Notification', {
             body: 'This is a test notification from Chutadamon\'s Birthday Website!',
-            icon: '/icon-192.png',
-            badge: '/icon-192.png'
+            icon: '/icon-192x192.png',
+            badge: '/icon-192x192.png'
         });
         showNotification('🧪 Test notification sent!');
     } else {
@@ -586,8 +492,8 @@ function initializeNavigation() {
     console.log('🧭 Initializing COMPLETELY FIXED navigation...');
     
     try {
-        const navToggle = document.querySelector('.nav-toggle');
-        const navMenu = document.querySelector('.nav-menu');
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
         const navLinks = document.querySelectorAll('.nav-link');
 
         console.log('Navigation elements found:', {
@@ -617,11 +523,15 @@ function initializeNavigation() {
         if (navLinks.length > 0) {
             navLinks.forEach((link, index) => {
                 link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
                     const href = this.getAttribute('href');
                     console.log(`🔗 Nav link ${index} clicked:`, href);
+
+                    if (this.id === 'add-to-home') {
+                        return; 
+                    }
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
                     
                     if (href && href.startsWith('#')) {
                         const targetId = href.substring(1);
@@ -662,6 +572,8 @@ function initializeNavigation() {
             console.log(`Section ${index}: ${section.id}`);
             if (section.id !== 'home') {
                 section.classList.remove('active');
+            } else {
+                 section.classList.add('active');
             }
         });
         
@@ -1001,8 +913,8 @@ function scheduleMealReminder(mealType, timeString) {
             if (notificationPermission === 'granted') {
                 new Notification(`${getMealIcon(mealType)} ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} Time!`, {
                     body: message,
-                    icon: '/icon-192.png',
-                    badge: '/icon-192.png',
+                    icon: '/icon-192x192.png',
+                    badge: '/icon-192x192.png',
                     requireInteraction: true
                 });
             }
@@ -1049,8 +961,8 @@ function scheduleWaterReminder(intervalMinutes) {
             if (notificationPermission === 'granted') {
                 new Notification('💧 Hydration Time!', {
                     body: message,
-                    icon: '/icon-192.png',
-                    badge: '/icon-192.png'
+                    icon: '/icon-192x192.png',
+                    badge: '/icon-192x192.png'
                 });
             }
             
@@ -1261,11 +1173,12 @@ function checkSpotifyCallback() {
         // Check for access token (Implicit Grant Flow) 
         const accessToken = hashParams.get('access_token');
         const expiresIn = hashParams.get('expires_in');
-        const error = urlParams.get('error') || urlParams.get('error_description') || hashParams.get('error') || hashParams.get('error_description');
+        const error = urlParams.get('error') || hashParams.get('error');
         
         if (error) {
             console.error('❌ Spotify authorization error:', error);
-            showSpotifyError(`Authorization failed: ${error}`);
+            const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
+            showSpotifyError(`Authorization failed: ${errorDescription || error}`);
             
             // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1302,7 +1215,7 @@ function checkSpotifyCallback() {
 
 async function exchangeCodeForToken(code) {
     try {
-        const { clientId, redirectUri, scopes } = appData.spotifyConfig;
+        const { clientId, redirectUri } = appData.spotifyConfig;
         const codeVerifier = localStorage.getItem('spotify_code_verifier');
         
         console.log('🔄 Exchange token params:');
@@ -2195,7 +2108,7 @@ function initializeGallery() {
         const slideshowModal = document.getElementById('slideshow-modal');
         const closeSlideshow = document.getElementById('close-slideshow');
         const prevSlide = document.getElementById('prev-slide');
-        const nextSlide = document.getElementById('next-slide');
+        const nextSlideBtn = document.getElementById('next-slide');
         
         if (uploadBtn && photoUpload) {
             uploadBtn.addEventListener('click', function(e) {
@@ -2230,8 +2143,8 @@ function initializeGallery() {
             });
         }
         
-        if (nextSlide) {
-            nextSlide.addEventListener('click', function(e) {
+        if (nextSlideBtn) {
+            nextSlideBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 nextSlide();
             });
@@ -2341,10 +2254,7 @@ function displayPhoto(photo) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            // FIXED: Replaced confirm() with a custom modal function
-            showConfirmationModal('Are you sure you want to delete this photo?', () => {
-                removePhoto(photo.id);
-            });
+            removePhoto(photo.id);
         });
     }
     
@@ -2352,12 +2262,14 @@ function displayPhoto(photo) {
 }
 
 function removePhoto(photoId) {
-    const photoIndex = photos.findIndex(p => p.id === photoId);
-    if (photoIndex !== -1) {
-        photos.splice(photoIndex, 1);
-        updateGalleryDisplay();
-        saveGalleryData();
-        showNotification('Photo deleted 🗑️');
+    if (confirm('Are you sure you want to delete this photo?')) {
+        const photoIndex = photos.findIndex(p => p.id === photoId);
+        if (photoIndex !== -1) {
+            photos.splice(photoIndex, 1);
+            updateGalleryDisplay();
+            saveGalleryData();
+            showNotification('Photo deleted 🗑️');
+        }
     }
 }
 
@@ -2441,8 +2353,6 @@ function initializeCalendar() {
         const nextMonthBtn = document.getElementById('next-month');
         const addEventBtn = document.getElementById('add-event-btn');
         const eventModal = document.getElementById('event-modal');
-        const closeEventModalBtn = document.getElementById('close-event-modal');
-        const cancelEventBtn = document.getElementById('cancel-event');
         
         if (prevMonthBtn) {
             prevMonthBtn.addEventListener('click', function(e) {
@@ -2463,20 +2373,6 @@ function initializeCalendar() {
                 e.preventDefault();
                 openEventModal();
             });
-        }
-
-        if (closeEventModalBtn) {
-            closeEventModalBtn.addEventListener('click', closeEventModal);
-        }
-
-        if (cancelEventBtn) {
-            cancelEventBtn.addEventListener('click', closeEventModal);
-        }
-
-        // Add form submit listener
-        const eventForm = document.getElementById('event-form');
-        if (eventForm) {
-            eventForm.addEventListener('submit', saveEvent);
         }
         
         // Initialize calendar display
@@ -2624,55 +2520,83 @@ function nextMonth() {
     showNotification('📅 Next month');
 }
 
-// FIXED: Consolidated modal logic into one place
 function openEventModal(date = null, existingEvent = null) {
     const modal = document.getElementById('event-modal');
     if (!modal) return;
     
-    const titleInput = document.getElementById('event-title');
-    const dateInput = document.getElementById('event-date');
-    const timeInput = document.getElementById('event-time');
-    const descriptionTextarea = document.getElementById('event-description');
-    const modalTitle = document.getElementById('event-modal-title');
-    const saveBtn = document.querySelector('#event-form button[type="submit"]');
-    const deleteBtnContainer = modal.querySelector('.modal-actions .left-actions');
+    currentEventId = existingEvent ? existingEvent.id : null;
     
-    if (existingEvent) {
-        currentEventId = existingEvent.id;
-        modalTitle.textContent = 'Edit Event';
-        titleInput.value = existingEvent.title;
-        dateInput.value = existingEvent.date;
-        timeInput.value = existingEvent.time || '';
-        descriptionTextarea.value = existingEvent.description || '';
-        saveBtn.textContent = 'Update Event';
+    // Create modal content
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.innerHTML = `
+        <div class="modal-header">
+            <h2>${existingEvent ? 'Edit Event' : 'Add New Event'}</h2>
+            <button type="button" class="close-btn" onclick="closeEventModal()">×</button>
+        </div>
         
-        // Add delete button
-        if (!deleteBtnContainer.querySelector('.btn--danger')) {
-            const deleteButton = document.createElement('button');
-            deleteButton.type = 'button';
-            deleteButton.className = 'btn btn--danger';
-            deleteButton.textContent = '🗑️ Delete';
-            deleteButton.addEventListener('click', () => {
-                showConfirmationModal('Are you sure you want to delete this event?', () => deleteEvent(currentEventId));
-            });
-            deleteBtnContainer.appendChild(deleteButton);
-        }
-        
-    } else {
-        currentEventId = null;
-        modalTitle.textContent = 'Add New Event';
-        titleInput.value = '';
-        dateInput.value = date ? date.toISOString().split('T')[0] : '';
-        timeInput.value = '';
-        descriptionTextarea.value = '';
-        saveBtn.textContent = 'Save Event';
-        
-        // Remove delete button
-        deleteBtnContainer.innerHTML = '';
-    }
+        <form class="event-form" onsubmit="saveEvent(event)">
+            <div class="form-group">
+                <label for="event-title">Event Title *</label>
+                <input type="text" id="event-title" required 
+                       value="${existingEvent ? existingEvent.title : ''}" 
+                       placeholder="Enter event title...">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="event-date">Date *</label>
+                    <input type="date" id="event-date" required 
+                           value="${existingEvent ? existingEvent.date : (date ? date.toISOString().split('T')[0] : '')}">
+                </div>
+                <div class="form-group">
+                    <label for="event-time">Time</label>
+                    <input type="time" id="event-time" 
+                           value="${existingEvent ? existingEvent.time || '' : ''}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="event-description">Description</label>
+                <textarea id="event-description" rows="3" 
+                          placeholder="Enter description...">${existingEvent ? existingEvent.description || '' : ''}</textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="event-color">Color</label>
+                    <input type="color" id="event-color" 
+                           value="${existingEvent ? existingEvent.color || '#FF6B9D' : '#FF6B9D'}">
+                </div>
+                <div class="form-group">
+                    <label for="event-category">Category</label>
+                    <select id="event-category">
+                        <option value="general" ${existingEvent && existingEvent.category === 'general' ? 'selected' : ''}>General</option>
+                        <option value="birthday" ${existingEvent && existingEvent.category === 'birthday' ? 'selected' : ''}>Birthday</option>
+                        <option value="work" ${existingEvent && existingEvent.category === 'work' ? 'selected' : ''}>Work</option>
+                        <option value="personal" ${existingEvent && existingEvent.category === 'personal' ? 'selected' : ''}>Personal</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <div class="left-actions">
+                    ${existingEvent ? '<button type="button" onclick="deleteEvent(' + existingEvent.id + ')" class="btn btn--danger">🗑️ Delete</button>' : ''}
+                </div>
+                <div class="right-actions">
+                    <button type="button" onclick="closeEventModal()" class="btn btn--outline">Cancel</button>
+                    <button type="submit" class="btn btn--primary">${existingEvent ? 'Update' : 'Add'} Event</button>
+                </div>
+            </div>
+        </form>
+    `;
     
     modal.classList.remove('hidden');
-    titleInput.focus();
+    
+    // Focus on title input
+    setTimeout(() => {
+        const titleInput = document.getElementById('event-title');
+        if (titleInput) titleInput.focus();
+    }, 100);
 }
 
 function closeEventModal() {
@@ -2680,7 +2604,6 @@ function closeEventModal() {
     if (modal) {
         modal.classList.add('hidden');
     }
-    currentEventId = null;
 }
 
 function saveEvent(e) {
@@ -2690,20 +2613,22 @@ function saveEvent(e) {
     const date = document.getElementById('event-date').value;
     const time = document.getElementById('event-time').value;
     const description = document.getElementById('event-description').value.trim();
+    const color = document.getElementById('event-color').value;
+    const category = document.getElementById('event-category').value;
     
     if (!title || !date) {
         showNotification('❌ Please fill in title and date');
         return;
     }
-
+    
     const event = {
         id: currentEventId || Date.now(),
         title,
         date,
         time,
         description,
-        color: '#FF6B9D', // Default color for now
-        category: 'general',
+        color,
+        category,
         createdAt: currentEventId ? events.find(e => e.id === currentEventId)?.createdAt : new Date().toISOString()
     };
     
@@ -2725,14 +2650,16 @@ function saveEvent(e) {
 }
 
 function deleteEvent(eventId) {
-    const index = events.findIndex(e => e.id === eventId);
-    if (index !== -1) {
-        events.splice(index, 1);
-        saveCalendarData();
-        renderCalendar();
-        updateEventsList();
-        closeEventModal();
-        showNotification('🗑️ Event deleted');
+    if (confirm('Are you sure you want to delete this event?')) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index !== -1) {
+            events.splice(index, 1);
+            saveCalendarData();
+            renderCalendar();
+            updateEventsList();
+            closeEventModal();
+            showNotification('🗑️ Event deleted');
+        }
     }
 }
 
@@ -2759,11 +2686,8 @@ function updateEventsList() {
             day: 'numeric' 
         });
         
-        // Fixed JSON stringify for event object to pass to onclick
-        const eventJson = JSON.stringify(event).replace(/"/g, '&quot;');
-        
         return `
-            <div class="event-item" onclick="openEventModal(null, JSON.parse(decodeURIComponent('${encodeURIComponent(eventJson)}')))" 
+            <div class="event-item" onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '"')})" 
                  style="border-left-color: ${event.color};">
                 <div class="event-header">
                     <div class="event-title">${getCategoryIcon(event.category)} ${event.title}</div>
@@ -2797,8 +2721,6 @@ function saveCalendarData() {
         console.error('❌ Error saving calendar data:', error);
     }
 }
-
-// ADDED: Missing function to save gallery data
 function saveGalleryData() {
     try {
         localStorage.setItem('chutadamon_photos', JSON.stringify(photos));
@@ -2807,28 +2729,18 @@ function saveGalleryData() {
         console.error('❌ Error saving gallery data:', error);
     }
 }
-
-// ADDED: Missing function to save reminders data
 function saveRemindersData() {
     try {
         const remindersData = {
             meals: {
-                breakfast: {
-                    enabled: document.getElementById('breakfast-toggle').checked,
-                    time: document.getElementById('breakfast-time').value
-                },
-                lunch: {
-                    enabled: document.getElementById('lunch-toggle').checked,
-                    time: document.getElementById('lunch-time').value
-                },
-                dinner: {
-                    enabled: document.getElementById('dinner-toggle').checked,
-                    time: document.getElementById('dinner-time').value
-                }
+                breakfast: { enabled: document.getElementById('breakfast-toggle').checked, time: document.getElementById('breakfast-time').value },
+                lunch: { enabled: document.getElementById('lunch-toggle').checked, time: document.getElementById('lunch-time').value },
+                dinner: { enabled: document.getElementById('dinner-toggle').checked, time: document.getElementById('dinner-time').value }
             },
             water: {
                 enabled: document.getElementById('water-toggle').checked,
-                interval: document.getElementById('water-interval-select').value
+                interval: document.getElementById('water-interval-select').value,
+                progress: waterProgress
             }
         };
         localStorage.setItem('chutadamon_reminders', JSON.stringify(remindersData));
@@ -2909,6 +2821,32 @@ function loadSavedData() {
     }
 }
 
+// MISSING FUNCTION FOR EVENT MODAL
+function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentEventId = null; // Reset current event ID
+}
+
+
+// ADDITIONAL HELPER FUNCTION FOR BETTER DATA MANAGEMENT
+function clearAllSavedData() {
+    try {
+        localStorage.removeItem('chutadamon_events');
+        localStorage.removeItem('chutadamon_photos');
+        localStorage.removeItem('chutadamon_reminders');
+        events = [];
+        photos = [];
+        console.log('🗑️ All saved data cleared');
+        showNotification('🗑️ All data cleared successfully');
+    } catch (error) {
+        console.error('❌ Error clearing data:', error);
+    }
+}
+
+
 // FIXED: Continuous Auto-Playing Slideshow
 let isSlideShowRunning = false;
 let slideShowInterval = null;
@@ -2986,30 +2924,6 @@ function stopContinuousSlideshow() {
     showNotification('🛑 Slideshow stopped');
 }
 
-function updateSlideshow() {
-    if (photos.length === 0) return;
-    
-    const slideshowImage = document.getElementById('slideshow-image');
-    const slideCounter = document.getElementById('slide-counter');
-    
-    if (slideshowImage && photos[currentSlideIndex]) {
-        slideshowImage.style.opacity = '0';
-        setTimeout(() => {
-            slideshowImage.src = photos[currentSlideIndex].src;
-            slideshowImage.style.opacity = '1';
-        }, 300);
-    }
-    
-    if (slideCounter) {
-        slideCounter.textContent = `${currentSlideIndex + 1} / ${photos.length}`;
-    }
-}
-
-function nextSlide() {
-    if (photos.length === 0) return;
-    currentSlideIndex = (currentSlideIndex + 1) % photos.length;
-}
-
 
 // Notification System
 function showNotification(message, type = 'info') {
@@ -3073,34 +2987,6 @@ function createCustomNotification(message, type) {
     } catch (error) {
         console.error('❌ Error creating notification:', error);
     }
-}
-
-// ADDED: Custom confirmation modal to replace `confirm()`
-function showConfirmationModal(message, onConfirm) {
-    const confirmationModal = document.createElement('div');
-    confirmationModal.className = 'modal';
-    confirmationModal.id = 'confirmation-modal';
-    confirmationModal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirmation</h3>
-                <button class="modal-close" onclick="document.getElementById('confirmation-modal').remove();">&times;</button>
-            </div>
-            <p>${message}</p>
-            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-                <button class="btn btn--outline" onclick="document.getElementById('confirmation-modal').remove();">Cancel</button>
-                <button class="btn btn--danger" id="confirm-action-btn">Confirm</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(confirmationModal);
-
-    const confirmBtn = document.getElementById('confirm-action-btn');
-    confirmBtn.addEventListener('click', () => {
-        onConfirm();
-        confirmationModal.remove();
-    });
 }
 
 // Add required CSS animations
