@@ -4,8 +4,8 @@
     "description": "A special birthday website for Chutadamon with music, photos, and memories",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#FF6B9D",
+    "background_color": "#0a0a0a",
+    "theme_color": "#262828",
     "orientation": "portrait-primary",
     "icons": [
         {
