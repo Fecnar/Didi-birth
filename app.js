@@ -348,6 +348,100 @@ function showNotificationBanner() {
     }
 }
 
+// HAMBURGER MENU JAVASCRIPT - COMPLETE FIX
+function initializeNavigation() {
+    console.log('🧭 Initializing navigation...');
+    
+    try {
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        console.log('Navigation elements found:', {
+            navToggle: !!navToggle,
+            navMenu: !!navMenu,
+            navLinks: navLinks.length
+        });
+
+        // FIXED: Mobile menu toggle
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📱 Nav toggle clicked');
+                
+                // Toggle active classes
+                navMenu.classList.toggle('active');
+                navToggle.classList.toggle('active');
+                
+                // Log current state
+                console.log('Menu active:', navMenu.classList.contains('active'));
+                
+                // Add haptic feedback on mobile
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            });
+            console.log('✅ Mobile menu toggle initialized');
+        } else {
+            console.error('❌ Nav toggle or nav menu not found!', {
+                navToggle: navToggle,
+                navMenu: navMenu
+            });
+        }
+
+        // Navigation links
+        if (navLinks.length > 0) {
+            navLinks.forEach((link, index) => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    console.log(`🔗 Nav link ${index} clicked:`, href);
+                    
+                    // Don't prevent default for Add to Home button
+                    if (this.id === 'add-to-home') {
+                        return; // Let the add-to-home handler deal with this
+                    }
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (href && href.startsWith('#')) {
+                        const targetId = href.substring(1);
+                        console.log('🎯 Switching to section:', targetId);
+                        
+                        const success = switchSection(targetId);
+                        
+                        if (success) {
+                            // Update active state
+                            navLinks.forEach(l => l.classList.remove('active'));
+                            this.classList.add('active');
+                            
+                            // Close mobile menu
+                            if (navMenu) navMenu.classList.remove('active');
+                            if (navToggle) navToggle.classList.remove('active');
+                            
+                            showNotification(`📱 Navigated to ${targetId.charAt(0).toUpperCase() + targetId.slice(1)}`);
+                        }
+                    }
+                });
+            });
+            console.log('✅ Navigation links initialized:', navLinks.length);
+        }
+        
+        console.log('✅ Navigation completely initialized');
+    } catch (error) {
+        console.error('❌ Error initializing navigation:', error);
+    }
+}
+
+// Make sure this runs on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your other initialization code ...
+    initializeNavigation(); // Make sure this is called
+    // ... rest of your code ...
+});
+
+
 function hideNotificationBanner() {
     const banner = document.getElementById('notification-banner');
     if (banner) {
