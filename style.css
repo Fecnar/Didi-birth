@@ -1024,7 +1024,7 @@ select.form-control {
 .nav-toggle {
     display: none;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.9); /* Much darker - nearly black */
+    background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border for contrast */
     border-radius: var(--radius-base);
@@ -1053,8 +1053,7 @@ select.form-control {
 
 
 .nav-menu {
-  display: flex;
-  gap: var(--space-8);
+  background: rgba(0, 0, 0, 0.95);
 }
 
 .nav-link {
@@ -1096,7 +1095,11 @@ select.form-control {
   }
 
   .nav-menu.active {
-    left: 0;
+    background: rgba(0, 0, 0, 0.98) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    z-index: 99999 !important;
   }
 
   .nav-link {
@@ -1104,6 +1107,16 @@ select.form-control {
     margin: var(--space-4) var(--space-16);
     font-size: var(--font-size-lg);
     border-radius: var(--radius-base);
+  }
+
+  .nav-menu.active .nav-link {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+.nav-menu.active .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
   }
 
   .nav-toggle.active .hamburger:nth-child(2) {

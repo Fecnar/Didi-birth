@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeGallery();
         initializeSpotify();
         initializeCalendar();
+        initializeAddToHome(); // ADD THIS LINE
         loadSavedData();
         
         console.log('✨ Website fully loaded and ready to celebrate!');
@@ -124,6 +125,118 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('Something went wrong, but we\'re still celebrating! 🎉');
     }
 });
+
+// ADD TO HOME SCREEN FUNCTIONALITY
+let deferredPrompt = null;
+let addToHomeBtn = null;
+
+// Initialize Add to Home functionality
+function initializeAddToHome() {
+    console.log('📱 Initializing Add to Home Screen functionality...');
+    
+    addToHomeBtn = document.getElementById('add-to-home');
+    
+    if (addToHomeBtn) {
+        // Initially hide the button
+        addToHomeBtn.style.display = 'none';
+        
+        // Add click handler
+        addToHomeBtn.addEventListener('click', handleAddToHomeClick);
+        console.log('✅ Add to Home button initialized');
+    }
+}
+
+// Listen for the beforeinstallprompt event
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('📱 Install prompt available');
+    
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    
+    // Store the event for later use
+    deferredPrompt = e;
+    
+    // Show the Add to Home button
+    if (addToHomeBtn) {
+        addToHomeBtn.style.display = 'block';
+        showNotification('📱 You can now add this site to your home screen!');
+    }
+});
+
+// Handle Add to Home button click
+async function handleAddToHomeClick(e) {
+    e.preventDefault();
+    
+    console.log('📱 Add to Home button clicked');
+    
+    if (!deferredPrompt) {
+        // Fallback for browsers that don't support the install prompt
+        showAddToHomeInstructions();
+        return;
+    }
+    
+    try {
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for user choice
+        const choiceResult = await deferredPrompt.userChoice;
+        
+        if (choiceResult.outcome === 'accepted') {
+            console.log('✅ User accepted the install prompt');
+            showNotification('🎉 App installed successfully!');
+            
+            // Hide the button after successful install
+            if (addToHomeBtn) {
+                addToHomeBtn.style.display = 'none';
+            }
+        } else {
+            console.log('❌ User dismissed the install prompt');
+            showNotification('📱 You can install this app anytime from the menu');
+        }
+        
+        // Clear the prompt
+        deferredPrompt = null;
+        
+    } catch (error) {
+        console.error('❌ Error showing install prompt:', error);
+        showAddToHomeInstructions();
+    }
+}
+
+// Show manual instructions for browsers that don't support PWA install
+function showAddToHomeInstructions() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent);
+    
+    let instructions = '';
+    
+    if (isIOS) {
+        instructions = 'On iOS: Tap the Share button in Safari, then tap "Add to Home Screen"';
+    } else if (isChrome) {
+        instructions = 'In Chrome: Click the three dots menu → "Add to Home screen"';
+    } else {
+        instructions = 'Check your browser menu for "Add to Home Screen" or "Install App" option';
+    }
+    
+    alert(`📱 Add to Home Screen\n\n${instructions}\n\nThis will create a shortcut to Chutadamon's Birthday Website on your device!`);
+}
+
+// Listen for successful app installation
+window.addEventListener('appinstalled', (e) => {
+    console.log('✅ App successfully installed');
+    showNotification('🎉 Birthday website installed! Check your home screen!');
+    
+    // Hide the Add to Home button
+    if (addToHomeBtn) {
+        addToHomeBtn.style.display = 'none';
+    }
+});
+
+// Call this function during your app initialization
+// Add this line in your DOMContentLoaded event listener:
+// initializeAddToHome();
+
 
 // FIXED NOTIFICATION SYSTEM
 function initializeNotificationSystem() {
@@ -2591,6 +2704,111 @@ function getCategoryIcon(category) {
         important: '⭐'
     };
     return icons[category] || '📅';
+}
+
+// MISSING CALENDAR DATA PERSISTENCE FUNCTIONS
+function saveCalendarData() {
+    try {
+        localStorage.setItem('chutadamon_events', JSON.stringify(events));
+        console.log('💾 Calendar data saved');
+    } catch (error) {
+        console.error('❌ Error saving calendar data:', error);
+    }
+}
+
+function loadSavedData() {
+    console.log('💾 Loading saved data...');
+    
+    try {
+        // Load reminders (existing code you already have)
+        const savedReminders = localStorage.getItem('chutadamon_reminders');
+        if (savedReminders) {
+            const remindersData = JSON.parse(savedReminders);
+            
+            // Load meal settings
+            Object.entries(remindersData.meals || {}).forEach(([mealType, mealData]) => {
+                const toggle = document.getElementById(`${mealType}-toggle`);
+                const timeSelect = document.getElementById(`${mealType}-time`);
+                
+                if (toggle) toggle.checked = mealData.enabled;
+                if (timeSelect) timeSelect.value = mealData.time;
+                
+                // Schedule if enabled and permission granted
+                if (mealData.enabled && notificationPermission === 'granted') {
+                    setTimeout(() => {
+                        scheduleMealReminder(mealType, mealData.time);
+                    }, 1000);
+                }
+            });
+            
+            // Load water settings
+            if (remindersData.water) {
+                const waterToggle = document.getElementById('water-toggle');
+                const intervalSelect = document.getElementById('water-interval-select');
+                
+                if (waterToggle) waterToggle.checked = remindersData.water.enabled;
+                if (intervalSelect) intervalSelect.value = remindersData.water.interval;
+                
+                waterProgress = remindersData.water.progress || 0;
+                updateWaterProgress();
+                
+                // Schedule if enabled and permission granted
+                if (remindersData.water.enabled && notificationPermission === 'granted') {
+                    setTimeout(() => {
+                        scheduleWaterReminder(remindersData.water.interval);
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Load photos (existing code you already have)
+        const savedPhotos = localStorage.getItem('chutadamon_photos');
+        if (savedPhotos) {
+            photos = JSON.parse(savedPhotos);
+            updateGalleryDisplay();
+        }
+        
+        // Load calendar events - THIS WAS MISSING!
+        const savedEvents = localStorage.getItem('chutadamon_events');
+        if (savedEvents) {
+            events = JSON.parse(savedEvents);
+            console.log(`📅 Loaded ${events.length} calendar events`);
+        } else {
+            events = []; // Initialize empty events array if no saved data
+        }
+        
+        console.log('✅ Data loading complete!');
+    } catch (error) {
+        console.error('❌ Error loading saved data:', error);
+        // Initialize empty arrays if loading fails
+        events = [];
+        photos = photos || [];
+    }
+}
+
+// MISSING FUNCTION FOR EVENT MODAL
+function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentEventId = null; // Reset current event ID
+}
+
+
+// ADDITIONAL HELPER FUNCTION FOR BETTER DATA MANAGEMENT
+function clearAllSavedData() {
+    try {
+        localStorage.removeItem('chutadamon_events');
+        localStorage.removeItem('chutadamon_photos');
+        localStorage.removeItem('chutadamon_reminders');
+        events = [];
+        photos = [];
+        console.log('🗑️ All saved data cleared');
+        showNotification('🗑️ All data cleared successfully');
+    } catch (error) {
+        console.error('❌ Error clearing data:', error);
+    }
 }
 
 
