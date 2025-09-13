@@ -75,6 +75,14 @@ let currentVolume = 0.5;
 let notificationPermission = 'default';
 let notificationSupported = 'Notification' in window;
 
+// FIXED: Define Spotify Web Playback SDK callback globally
+window.onSpotifyWebPlaybackSDKReady = () => {
+    console.log('🎧 Spotify Web Playback SDK is ready');
+    if (spotifyAccessToken) {
+        setupSpotifyPlayer();
+    }
+};
+
 // FIXED: Initialize the application when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Initializing Chutadamon\'s Birthday Website - FULL VERSION...');
@@ -962,7 +970,6 @@ function formatTime(time24) {
 // COMPLETELY FIXED SPOTIFY INTEGRATION
 function initializeSpotify() {
     console.log('🎵 Initializing COMPLETELY FIXED Spotify integration...');
-    
     try {
         // Check URL for callback parameters first
         checkSpotifyCallback();
@@ -1020,6 +1027,7 @@ function initializeSpotify() {
     }
 }
 
+
 // FIXED: Check for Spotify callback with proper error handling
 function checkSpotifyCallback() {
     console.log('🔍 Checking for Spotify callback...');
@@ -1064,9 +1072,11 @@ function checkSpotifyCallback() {
             showNotification('🎉 Successfully connected to Spotify!');
             
         } else if (code) {
-            console.log('🔑 Found authorization code, but using Implicit Grant for simplicity');
-            // For now, we'll use Implicit Grant Flow, but this could be enhanced to use Authorization Code Flow
+        console.log('🔑 Found authorization code, exchanging for token...');
+        exchangeCodeForToken(code);
+        window.history.replaceState({}, document.title, window.location.pathname);
         }
+
         
     } catch (error) {
         console.error('❌ Error checking Spotify callback:', error);
@@ -1334,25 +1344,22 @@ function hideSpotifyError() {
 
 async function initializeWebPlayback() {
     console.log('🎧 Initializing Web Playback SDK...');
-    
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         if (window.Spotify && window.Spotify.Player) {
+            console.log('🎧 Spotify Player already available');
             setupSpotifyPlayer();
             resolve();
         } else {
-            window.onSpotifyWebPlaybackSDKReady = () => {
-                setupSpotifyPlayer();
-                resolve();
-            };
-            
-            // Timeout in case SDK doesn't load
+            console.log('🎧 Waiting for Spotify Web Playback SDK...');
+            // SDK will call the global callback when ready
             setTimeout(() => {
                 console.warn('⚠️ Spotify Web Playback SDK timeout');
                 resolve(); // Continue without player
-            }, 5000);
+            }, 10000);
         }
     });
 }
+
 
 function setupSpotifyPlayer() {
     console.log('🎧 Setting up Spotify Player...');
