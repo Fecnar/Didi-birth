@@ -1024,30 +1024,33 @@ select.form-control {
 .nav-toggle {
     display: none;
     flex-direction: column;
-    background: var(--color-secondary);
+    background: rgba(0, 0, 0, 0.9); /* Much darker - nearly black */
     backdrop-filter: blur(10px);
-    border: 1px solid var(--color-border);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border for contrast */
     border-radius: var(--radius-base);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-lg);
     cursor: pointer;
     padding: var(--space-12);
     transition: all 0.3s ease;
 }
 
 .nav-toggle:hover {
-    background: var(--color-secondary-hover);
+    background: rgba(0, 0, 0, 0.95); /* Even darker on hover */
+    border: 1px solid rgba(255, 255, 255, 0.5);
     transform: scale(1.05);
     box-shadow: var(--shadow-md);
 }
 
+
 .hamburger {
-  width: 25px;
-  height: 3px;
-  background: var(--color-text);
-  margin: 3px 0;
-  transition: all 0.3s ease;
-  border-radius: 2px;
+    width: 25px;
+    height: 3px;
+    background: #ffffff; /* Pure white for maximum contrast */
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
 }
+
 
 .nav-menu {
   display: flex;
