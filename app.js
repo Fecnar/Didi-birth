@@ -1453,6 +1453,49 @@ function setupSpotifyPlayer() {
     }
 }
 
+async function startWebPlayback(trackUri = null, contextUri = null) {
+    console.log('🎵 Starting web playback...');
+    try {
+        if (!deviceId) {
+            console.error('❌ No device ID available');
+            showNotification('❌ Player not ready');
+            return;
+        }
+
+        // First, transfer playback to this device
+        await spotifyApiCall('/me/player', {
+            method: 'PUT',
+            body: JSON.stringify({
+                device_ids: [deviceId],
+                play: true
+            })
+        });
+
+        // Small delay to ensure device transfer
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Then start playback
+        const playPayload = {};
+        if (trackUri) {
+            playPayload.uris = [trackUri];
+        } else if (contextUri) {
+            playPayload.context_uri = contextUri;
+        }
+
+        await spotifyApiCall(`/me/player/play?device_id=${deviceId}`, {
+            method: 'PUT',
+            body: JSON.stringify(playPayload)
+        });
+
+        console.log('✅ Playback started successfully');
+        showNotification('🎵 Playing music!');
+        
+    } catch (error) {
+        console.error('❌ Error starting playback:', error);
+        showNotification('❌ Failed to start playback');
+    }
+}
+
 function updatePlayerState(state) {
     console.log('🔄 Updating player state');
     
@@ -1795,28 +1838,15 @@ function displayPlaylists(playlists) {
 
 async function playPlaylist(playlist) {
     console.log('🎵 Playing playlist:', playlist.name);
-    
     try {
-        if (!deviceId) {
-            showNotification('❌ Player not ready');
-            return;
-        }
-        
-        await spotifyApiCall('/me/player/play', {
-            method: 'PUT',
-            body: JSON.stringify({
-                context_uri: playlist.uri,
-                device_id: deviceId
-            })
-        });
-        
+        await startWebPlayback(null, playlist.uri);
         showNotification(`🎵 Playing: ${playlist.name}`);
-        
     } catch (error) {
         console.error('❌ Error playing playlist:', error);
         showNotification('❌ Error playing playlist');
     }
 }
+
 
 async function loadLikedSongs() {
     console.log('❤️ Loading liked songs...');
@@ -1873,28 +1903,15 @@ function displayLikedSongs(songs) {
 
 async function playTrack(trackUri) {
     console.log('🎵 Playing track:', trackUri);
-    
     try {
-        if (!deviceId) {
-            showNotification('❌ Player not ready');
-            return;
-        }
-        
-        await spotifyApiCall('/me/player/play', {
-            method: 'PUT',
-            body: JSON.stringify({
-                uris: [trackUri],
-                device_id: deviceId
-            })
-        });
-        
+        await startWebPlayback(trackUri);
         showNotification('🎵 Playing track');
-        
     } catch (error) {
         console.error('❌ Error playing track:', error);
         showNotification('❌ Error playing track');
     }
 }
+
 
 function spotifyLogout() {
     console.log('👋 Logging out of Spotify...');
@@ -2148,12 +2165,12 @@ function updateGalleryDisplay() {
 
 function startSlideshow() {
     if (photos.length > 0) {
-        openSlideshow(0);
-        showNotification('Starting slideshow! Use arrow keys to navigate 🎬');
+        startContinuousSlideshow(); // Use the new continuous version
     } else {
         showNotification('No photos to display. Upload some photos first! 📸');
     }
 }
+
 
 function openSlideshow(index) {
     if (photos.length === 0) return;
@@ -2623,6 +2640,109 @@ function loadSavedData() {
         console.error('❌ Error loading saved data:', error);
     }
 }
+
+// FIXED: Continuous Auto-Playing Slideshow
+let isSlideShowRunning = false;
+let slideShowInterval = null;
+let currentSlideIndex = 0;
+
+function startContinuousSlideshow() {
+    console.log('🎬 Starting continuous slideshow...');
+    
+    if (photos.length === 0) {
+        console.log('📸 No photos for slideshow');
+        return;
+    }
+
+    if (isSlideShowRunning) {
+        stopContinuousSlideshow();
+    }
+
+    isSlideShowRunning = true;
+    currentSlideIndex = 0;
+
+    // Create slideshow container if it doesn't exist
+    let slideshowContainer = document.getElementById('auto-slideshow');
+    if (!slideshowContainer) {
+        slideshowContainer = document.createElement('div');
+        slideshowContainer.id = 'auto-slideshow';
+        slideshowContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        `;
+        
+        slideshowContainer.innerHTML = `
+            <img id="slideshow-image" style="max-width: 90%; max-height: 80%; object-fit: contain; border-radius: 10px;">
+            <div style="color: white; margin-top: 20px; font-size: 18px;">
+                <span id="slide-counter">1 / ${photos.length}</span>
+                <button onclick="stopContinuousSlideshow()" style="margin-left: 20px; padding: 10px 20px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">Stop Slideshow</button>
+            </div>
+        `;
+        
+        document.body.appendChild(slideshowContainer);
+    }
+
+    updateSlideshow();
+    
+    // Auto-advance every 4 seconds
+    slideShowInterval = setInterval(() => {
+        nextSlide();
+        updateSlideshow();
+    }, 4000);
+
+    showNotification('🎬 Auto-slideshow started! Click "Stop Slideshow" to exit.');
+}
+
+function stopContinuousSlideshow() {
+    console.log('🛑 Stopping continuous slideshow...');
+    isSlideShowRunning = false;
+    
+    if (slideShowInterval) {
+        clearInterval(slideShowInterval);
+        slideShowInterval = null;
+    }
+
+    const slideshowContainer = document.getElementById('auto-slideshow');
+    if (slideshowContainer) {
+        slideshowContainer.remove();
+    }
+
+    showNotification('🛑 Slideshow stopped');
+}
+
+function updateSlideshow() {
+    if (photos.length === 0) return;
+    
+    const slideshowImage = document.getElementById('slideshow-image');
+    const slideCounter = document.getElementById('slide-counter');
+    
+    if (slideshowImage && photos[currentSlideIndex]) {
+        slideshowImage.style.opacity = '0';
+        setTimeout(() => {
+            slideshowImage.src = photos[currentSlideIndex].src;
+            slideshowImage.style.opacity = '1';
+        }, 300);
+    }
+    
+    if (slideCounter) {
+        slideCounter.textContent = `${currentSlideIndex + 1} / ${photos.length}`;
+    }
+}
+
+function nextSlide() {
+    if (photos.length === 0) return;
+    currentSlideIndex = (currentSlideIndex + 1) % photos.length;
+}
+
 
 // Notification System
 function showNotification(message, type = 'info') {
