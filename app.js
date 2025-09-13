@@ -1088,29 +1088,46 @@ async function exchangeCodeForToken(code) {
         const { clientId, redirectUri } = appData.spotifyConfig;
         const codeVerifier = localStorage.getItem('spotify_code_verifier');
         
+        console.log('🔄 Exchange token params:');
+        console.log('- Client ID:', clientId);
+        console.log('- Redirect URI:', redirectUri);
+        console.log('- Code:', code.substring(0, 10) + '...');
+        console.log('- Code Verifier exists:', !!codeVerifier);
+        console.log('- Code Verifier:', codeVerifier ? codeVerifier.substring(0, 10) + '...' : 'MISSING');
+        
         if (!codeVerifier) {
-            throw new Error('Code verifier not found');
+            throw new Error('Code verifier not found in localStorage');
         }
+        
+        const requestBody = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectUri,
+            client_id: clientId,
+            code_verifier: codeVerifier,
+        });
+        
+        console.log('🌐 Sending token request with body:', requestBody.toString());
         
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: new URLSearchParams({
-                grant_type: 'authorization_code',
-                code: code,
-                redirect_uri: redirectUri,
-                client_id: clientId,
-                code_verifier: codeVerifier,
-            }),
+            body: requestBody
         });
         
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', response.headers);
+        
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('❌ Token exchange error response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
         }
         
         const data = await response.json();
+        console.log('✅ Token exchange successful:', data);
         
         if (data.access_token) {
             console.log('🔑 Successfully received access token');
@@ -1140,19 +1157,23 @@ async function initiateSpotifyAuth() {
     try {
         const { clientId, redirectUri, scopes } = appData.spotifyConfig;
         
-        // Generate PKCE challenge
+        // Generate PKCE challenge - FIXED: Better error handling
         const codeVerifier = generateCodeVerifier();
+        console.log('🔑 Generated code verifier:', codeVerifier.substring(0, 10) + '...');
+        
         const codeChallenge = await generateCodeChallenge(codeVerifier);
+        console.log('🔑 Generated code challenge:', codeChallenge.substring(0, 10) + '...');
         
         // Store code verifier for later use
         localStorage.setItem('spotify_code_verifier', codeVerifier);
+        console.log('✅ Code verifier stored in localStorage');
         
         console.log('Auth parameters:', { clientId, redirectUri, scopes: scopes.join(' ') });
         
         // FIXED: Use Authorization Code Flow with PKCE
         const authUrl = new URL('https://accounts.spotify.com/authorize');
         authUrl.searchParams.append('client_id', clientId);
-        authUrl.searchParams.append('response_type', 'code'); // Changed from 'token' to 'code'
+        authUrl.searchParams.append('response_type', 'code');
         authUrl.searchParams.append('redirect_uri', redirectUri);
         authUrl.searchParams.append('scope', scopes.join(' '));
         authUrl.searchParams.append('code_challenge_method', 'S256');

@@ -1,0 +1,21 @@
+{
+    "name": "Chutadamon's Birthday Website",
+    "short_name": "Birthday Site",
+    "description": "A special birthday website for Chutadamon",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#32a0a0",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
