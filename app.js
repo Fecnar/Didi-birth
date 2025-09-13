@@ -965,31 +965,32 @@ function initializeSpotify() {
     
     try {
         // Check URL for callback parameters first
-        checkSpotifyCallback();
-        
-        // FIXED: Initialize UI elements with correct IDs
-        const loginBtn = document.getElementById('spotify-login');
-        const logoutBtn = document.getElementById('spotify-logout');
-        const retryBtn = document.getElementById('retry-spotify');
-        
-        if (loginBtn) {
-            loginBtn.addEventListener('click', initiateSpotifyAuth);
-            console.log('✅ Spotify login button initialized');
-        } else {
-            console.error('❌ Spotify login button not found');
-        }
-        
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', spotifyLogout);
-            console.log('✅ Spotify logout button initialized');
-        }
-        
-        if (retryBtn) {
-            retryBtn.addEventListener('click', () => {
-                hideSpotifyError();
-                initiateSpotifyAuth();
-            });
-            console.log('✅ Spotify retry button initialized');
+        function checkSpotifyCallback() {
+            console.log('🔍 Checking for Spotify callback...');
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // Check for authorization code (Authorization Code Flow)
+                const code = urlParams.get('code');
+                const error = urlParams.get('error');
+                
+                if (error) {
+                    console.error('❌ Spotify authorization error:', error);
+                    const errorDescription = urlParams.get('error_description');
+                    showSpotifyError(`Authorization failed: ${errorDescription || error}`);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    return;
+                }
+                
+                if (code) {
+                    console.log('🔑 Found authorization code, exchanging for token...');
+                    exchangeCodeForToken(code);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error checking Spotify callback:', error);
+            }
         }
         
         // Initialize player controls
@@ -1075,31 +1076,85 @@ function checkSpotifyCallback() {
     }
 }
 
+async function exchangeCodeForToken(code) {
+    try {
+        const { clientId, redirectUri } = appData.spotifyConfig;
+        const codeVerifier = localStorage.getItem('spotify_code_verifier');
+        
+        if (!codeVerifier) {
+            throw new Error('Code verifier not found');
+        }
+        
+        const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: redirectUri,
+                client_id: clientId,
+                code_verifier: codeVerifier,
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.access_token) {
+            console.log('🔑 Successfully received access token');
+            spotifyAccessToken = data.access_token;
+            
+            const expiryTime = Date.now() + (data.expires_in * 1000);
+            localStorage.setItem('spotify_access_token', data.access_token);
+            localStorage.setItem('spotify_token_expiry', expiryTime.toString());
+            
+            localStorage.removeItem('spotify_code_verifier');
+            
+            initializeSpotifyWithToken();
+            showNotification('🎉 Successfully connected to Spotify!');
+        } else {
+            throw new Error('No access token received');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error exchanging code for token:', error);
+        showSpotifyError('Failed to complete authorization. Please try again.');
+    }
+}
+
 // FIXED: Proper Spotify authorization with CORRECT redirect URI
-function initiateSpotifyAuth() {
-    console.log('🎵 Initiating FIXED Spotify authentication...');
-    
+async function initiateSpotifyAuth() {
+    console.log('🎵 Initiating FIXED Spotify authentication with PKCE...');
     try {
         const { clientId, redirectUri, scopes } = appData.spotifyConfig;
         
-        console.log('Auth parameters:', {
-            clientId,
-            redirectUri,
-            scopes: scopes.join(' ')
-        });
+        // Generate PKCE challenge
+        const codeVerifier = generateCodeVerifier();
+        const codeChallenge = await generateCodeChallenge(codeVerifier);
         
-        // FIXED: Use Implicit Grant Flow with CORRECT redirect URI
+        // Store code verifier for later use
+        localStorage.setItem('spotify_code_verifier', codeVerifier);
+        
+        console.log('Auth parameters:', { clientId, redirectUri, scopes: scopes.join(' ') });
+        
+        // FIXED: Use Authorization Code Flow with PKCE
         const authUrl = new URL('https://accounts.spotify.com/authorize');
         authUrl.searchParams.append('client_id', clientId);
-        authUrl.searchParams.append('response_type', 'token');
+        authUrl.searchParams.append('response_type', 'code'); // Changed from 'token' to 'code'
         authUrl.searchParams.append('redirect_uri', redirectUri);
         authUrl.searchParams.append('scope', scopes.join(' '));
+        authUrl.searchParams.append('code_challenge_method', 'S256');
+        authUrl.searchParams.append('code_challenge', codeChallenge);
         authUrl.searchParams.append('show_dialog', 'true');
         
         console.log('🔗 Redirecting to:', authUrl.toString());
         showNotification('🎵 Redirecting to Spotify for authorization...');
         
-        // Add small delay to show notification
         setTimeout(() => {
             window.location.href = authUrl.toString();
         }, 500);
@@ -1141,6 +1196,26 @@ async function initializeSpotifyWithToken() {
         showSpotifyError('Failed to connect to Spotify. Please try logging in again.');
         spotifyLogout();
     }
+}
+// Add these new PKCE helper functions:
+function generateCodeVerifier() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return base64URLEncode(array);
+}
+
+async function generateCodeChallenge(verifier) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return base64URLEncode(new Uint8Array(digest));
+}
+
+function base64URLEncode(array) {
+    return btoa(String.fromCharCode(...array))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
 }
 
 async function spotifyApiCall(endpoint, options = {}) {
