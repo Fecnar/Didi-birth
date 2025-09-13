@@ -1,7 +1,7 @@
 {
-    "name": "Chutadamon's Birthday Website",
+    "name": "Gauri's Birthday Website",
     "short_name": "Birthday 🎂",
-    "description": "A special birthday website for Chutadamon with music, photos, and memories",
+    "description": "A special birthday website for Gauri with music, photos, and memories",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0a0a0a",

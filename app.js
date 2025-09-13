@@ -1,11 +1,11 @@
 // Enhanced Birthday Website Application - FULLY FIXED NAVIGATION & ALL FEATURES
-console.log('🎉 Loading Chutadamon\'s Birthday Website with COMPLETE FIXES...');
+console.log('🎉 Loading Gauri\'s Birthday Website with COMPLETE FIXES...');
 
 // Application Data
 const appData = {
     userData: {
-        name: "Chutadamon",
-        displayName: "Chutadamon",
+        name: "Gauri",
+        displayName: "Gauri",
         birthday: "2025-09-13",
         bestSisterSince: "2005-10-05",
         birthdayGif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWQzc2pwMW5xcjNqeHR0bGJ2eDBqdmpvZHpnYzQ3MnhmMzlzOGd3aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9rO5Aksmn0dHQKXJAu/giphy.gif"
@@ -28,14 +28,14 @@ const appData = {
     notificationSettings: {
         requestPermissionOnLoad: true,
         mealReminders: {
-            breakfast: {"enabled": false, "time": "08:00", "message": "🍳 Time for breakfast, Chutadamon!"},
-            lunch: {"enabled": false, "time": "13:00", "message": "🥗 Lunch time, Chutadamon!"},
-            dinner: {"enabled": false, "time": "19:00", "message": "🍽️ Dinner is ready, Chutadamon!"}
+            breakfast: {"enabled": false, "time": "08:00", "message": "🍳 Time for breakfast, Didi!"},
+            lunch: {"enabled": false, "time": "13:00", "message": "🥗 Lunch time, Didi!"},
+            dinner: {"enabled": false, "time": "19:00", "message": "🍽️ Dinner is ready, Didi!"}
         },
         waterReminder: {
             enabled: false,
             interval: 60,
-            message: "💧 Time to drink some water, Chutadamon!"
+            message: "💧 Time to drink some water, Didi!"
         }
     }
 };
@@ -96,7 +96,7 @@ if (typeof window !== 'undefined') {
 
 // FIXED: Initialize the application when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initializing Chutadamon\'s Birthday Website - FULL VERSION...');
+    console.log('🚀 Initializing Gauri\'s Birthday Website - FULL VERSION...');
     
     try {
         // FIXED: Initialize notification system first
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show initial notification after a delay
         setTimeout(() => {
-            showNotification('🎉 Happy Birthday Chutadamon! Your special website is ready!');
+            showNotification('🎉 Happy Birthday Didi! Your special website is ready!');
         }, 1000);
         
     } catch (error) {
@@ -219,7 +219,7 @@ function showAddToHomeInstructions() {
         instructions = 'Check your browser menu for "Add to Home Screen" or "Install App" option';
     }
     
-    alert(`📱 Add to Home Screen\n\n${instructions}\n\nThis will create a shortcut to Chutadamon's Birthday Website on your device!`);
+    alert(`📱 Add to Home Screen\n\n${instructions}\n\nThis will create a shortcut to Gauri's Birthday Website on your device!`);
 }
 
 // Listen for successful app installation
@@ -402,7 +402,7 @@ function testNotification() {
     
     if (notificationPermission === 'granted') {
         new Notification('🧪 Test Notification', {
-            body: 'This is a test notification from Chutadamon\'s Birthday Website!',
+            body: 'This is a test notification from Gauri\'s Birthday Website!',
             icon: '/icon-192x192.png',
             badge: '/icon-192x192.png'
         });
@@ -1522,7 +1522,7 @@ function setupSpotifyPlayer() {
         }
         
         spotifyPlayer = new window.Spotify.Player({
-            name: 'Chutadamon\'s Birthday Player 🎂',
+            name: 'Gauri\'s Birthday Player 🎂',
             getOAuthToken: cb => { 
                 console.log('🔑 Player requesting OAuth token');
                 cb(spotifyAccessToken); 
@@ -2383,7 +2383,7 @@ function initializeCalendar() {
         if (events.length === 0) {
             events.push({
                 id: Date.now(),
-                title: "🎂 Chutadamon's Birthday!",
+                title: "🎂 Gauri's Birthday!",
                 date: "2025-09-13",
                 time: "00:00",
                 description: "The most amazing birthday ever!",
@@ -3058,4 +3058,4 @@ window.addEventListener('load', function() {
     setTimeout(updateNextReminderInfo, 1000);
 });
 
-console.log('🎂 Chutadamon\'s Birthday Website - COMPLETELY FIXED VERSION Ready! 🎉');
+console.log('🎂 Gauri\'s Birthday Website - COMPLETELY FIXED VERSION Ready! 🎉');
