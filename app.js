@@ -2225,9 +2225,9 @@ function nextSlide() {
     updateSlideshow();
 }
 
-// Calendar Functions
+// ENHANCED CALENDAR FUNCTIONS
 function initializeCalendar() {
-    console.log('📅 Initializing calendar...');
+    console.log('📅 Initializing ENHANCED calendar...');
     
     try {
         const prevMonthBtn = document.getElementById('prev-month');
@@ -2305,13 +2305,14 @@ function initializeCalendar() {
                 date: "2025-09-13",
                 time: "00:00",
                 description: "The most amazing birthday ever!",
-                color: "#FF6B9D"
+                color: "#FF6B9D",
+                category: "birthday"
             });
             saveCalendarData();
             updateEventsList();
         }
         
-        console.log('✅ Calendar initialized');
+        console.log('✅ Enhanced Calendar initialized');
     } catch (error) {
         console.error('❌ Error initializing calendar:', error);
     }
@@ -2375,20 +2376,36 @@ function renderCalendar() {
         );
         
         const eventsContainer = dayElement.querySelector('.day-events');
-        dayEvents.slice(0, 2).forEach(event => {
+        dayEvents.slice(0, 3).forEach(event => {
             const eventElement = document.createElement('div');
             eventElement.className = 'event-indicator';
-            eventElement.style.backgroundColor = event.color;
-            eventElement.textContent = event.title;
-            eventElement.title = event.title;
+            eventElement.style.backgroundColor = event.color || '#FF6B9D';
+            eventElement.style.cursor = 'pointer';
+            eventElement.textContent = event.title.length > 15 ? event.title.substring(0, 15) + '...' : event.title;
+            eventElement.title = `${event.title}\n${event.time ? 'at ' + formatTime(event.time) : 'All day'}\nClick to edit or delete`;
+            
+            // Click to edit event
+            eventElement.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openEventModal(null, event);
+            });
+            
             eventsContainer.appendChild(eventElement);
         });
         
-        if (dayEvents.length > 2) {
+        if (dayEvents.length > 3) {
             const moreElement = document.createElement('div');
-            moreElement.className = 'event-indicator';
+            moreElement.className = 'event-indicator more-events';
             moreElement.style.backgroundColor = '#666';
-            moreElement.textContent = `+${dayEvents.length - 2} more`;
+            moreElement.textContent = `+${dayEvents.length - 3} more`;
+            moreElement.style.cursor = 'pointer';
+            moreElement.title = 'Click to view all events for this day';
+            
+            moreElement.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showDayEvents(cellDate, dayEvents);
+            });
+            
             eventsContainer.appendChild(moreElement);
         }
         
@@ -2396,56 +2413,190 @@ function renderCalendar() {
     }
 }
 
-function isToday(date) {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-}
-
-function previousMonth() {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
-    showNotification('📅 Previous month');
-}
-
-function nextMonth() {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-    showNotification('📅 Next month');
-}
-
-function openEventModal(date = null) {
+// Enhanced event modal with color picker and delete functionality
+function openEventModal(date = null, existingEvent = null) {
     const modal = document.getElementById('event-modal');
     const dateInput = document.getElementById('event-date');
+    const titleInput = document.getElementById('event-title');
+    const timeInput = document.getElementById('event-time');
+    const descriptionInput = document.getElementById('event-description');
     
     if (!modal) return;
     
-    if (date && dateInput) {
-        dateInput.value = date.toISOString().split('T')[0];
-    }
-    
+    // Reset form
     const eventForm = document.getElementById('event-form');
     if (eventForm) {
         eventForm.reset();
     }
     
-    currentEventId = null;
-    const modalTitle = document.getElementById('event-modal-title');
-    if (modalTitle) {
-        modalTitle.textContent = 'Add New Event';
+    // Update modal content for enhanced features
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    modalContent.innerHTML = `
+        <div class="modal-header">
+            <h2 id="event-modal-title">${existingEvent ? 'Edit Event' : 'Add New Event'}</h2>
+            <button type="button" id="close-event-modal" class="close-btn">×</button>
+        </div>
+        
+        <form id="event-form" class="event-form">
+            <div class="form-group">
+                <label for="event-title">Event Title *</label>
+                <input type="text" id="event-title" name="title" required placeholder="Enter event title..." maxlength="50">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="event-date">Date *</label>
+                    <input type="date" id="event-date" name="date" required>
+                </div>
+                <div class="form-group half">
+                    <label for="event-time">Time</label>
+                    <input type="time" id="event-time" name="time" placeholder="Optional">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="event-description">Description</label>
+                <textarea id="event-description" name="description" placeholder="Enter event description..." rows="3" maxlength="200"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="event-color">Event Color</label>
+                    <div class="color-picker-group">
+                        <input type="color" id="event-color" name="color" value="#FF6B9D">
+                        <div class="color-presets">
+                            <button type="button" class="color-preset" data-color="#FF6B9D" style="background: #FF6B9D;" title="Pink"></button>
+                            <button type="button" class="color-preset" data-color="#4ECDC4" style="background: #4ECDC4;" title="Teal"></button>
+                            <button type="button" class="color-preset" data-color="#45B7D1" style="background: #45B7D1;" title="Blue"></button>
+                            <button type="button" class="color-preset" data-color="#96CEB4" style="background: #96CEB4;" title="Green"></button>
+                            <button type="button" class="color-preset" data-color="#FFEAA7" style="background: #FFEAA7;" title="Yellow"></button>
+                            <button type="button" class="color-preset" data-color="#DDA0DD" style="background: #DDA0DD;" title="Purple"></button>
+                            <button type="button" class="color-preset" data-color="#FFB347" style="background: #FFB347;" title="Orange"></button>
+                            <button type="button" class="color-preset" data-color="#FF6B6B" style="background: #FF6B6B;" title="Red"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group half">
+                    <label for="event-category">Category</label>
+                    <select id="event-category" name="category">
+                        <option value="general">General</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="health">Health</option>
+                        <option value="social">Social</option>
+                        <option value="important">Important</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <div class="left-actions">
+                    ${existingEvent ? '<button type="button" id="delete-event" class="btn btn--danger">🗑️ Delete Event</button>' : ''}
+                </div>
+                <div class="right-actions">
+                    <button type="button" id="cancel-event" class="btn btn--outline">Cancel</button>
+                    <button type="submit" class="btn btn--primary">${existingEvent ? '💾 Update Event' : '➕ Add Event'}</button>
+                </div>
+            </div>
+        </form>
+    `;
+    
+    // Populate form if editing existing event
+    if (existingEvent) {
+        currentEventId = existingEvent.id;
+        document.getElementById('event-title').value = existingEvent.title;
+        document.getElementById('event-date').value = existingEvent.date;
+        document.getElementById('event-time').value = existingEvent.time || '';
+        document.getElementById('event-description').value = existingEvent.description || '';
+        document.getElementById('event-color').value = existingEvent.color || '#FF6B9D';
+        document.getElementById('event-category').value = existingEvent.category || 'general';
+    } else {
+        currentEventId = null;
+        if (date && document.getElementById('event-date')) {
+            document.getElementById('event-date').value = date.toISOString().split('T')[0];
+        }
     }
+    
+    // Add event listeners for new elements
+    setupEventModalListeners();
     
     modal.classList.remove('hidden');
     
-    const titleInput = document.getElementById('event-title');
-    if (titleInput) {
-        setTimeout(() => titleInput.focus(), 100);
+    const titleInputField = document.getElementById('event-title');
+    if (titleInputField) {
+        setTimeout(() => titleInputField.focus(), 100);
     }
 }
 
-function closeEventModal() {
-    const modal = document.getElementById('event-modal');
-    if (modal) {
-        modal.classList.add('hidden');
+function setupEventModalListeners() {
+    // Close modal
+    const closeBtn = document.getElementById('close-event-modal');
+    const cancelBtn = document.getElementById('cancel-event');
+    const deleteBtn = document.getElementById('delete-event');
+    const eventForm = document.getElementById('event-form');
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeEventModal);
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeEventModal);
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                deleteEvent(currentEventId);
+                closeEventModal();
+            }
+        });
+    }
+    
+    if (eventForm) {
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveEvent(e);
+        });
+    }
+    
+    // Color preset buttons
+    const colorPresets = document.querySelectorAll('.color-preset');
+    const colorPicker = document.getElementById('event-color');
+    
+    colorPresets.forEach(preset => {
+        preset.addEventListener('click', function() {
+            const color = this.dataset.color;
+            if (colorPicker) {
+                colorPicker.value = color;
+            }
+            
+            // Update active state
+            colorPresets.forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Update active preset when color picker changes
+    if (colorPicker) {
+        colorPicker.addEventListener('change', function() {
+            const selectedColor = this.value;
+            colorPresets.forEach(p => {
+                if (p.dataset.color.toLowerCase() === selectedColor.toLowerCase()) {
+                    p.classList.add('active');
+                } else {
+                    p.classList.remove('active');
+                }
+            });
+        });
+        
+        // Set initial active state
+        const initialColor = colorPicker.value;
+        colorPresets.forEach(p => {
+            if (p.dataset.color.toLowerCase() === initialColor.toLowerCase()) {
+                p.classList.add('active');
+            }
+        });
     }
 }
 
@@ -2457,40 +2608,139 @@ function saveEvent(e) {
         const dateEl = document.getElementById('event-date');
         const timeEl = document.getElementById('event-time');
         const descriptionEl = document.getElementById('event-description');
+        const colorEl = document.getElementById('event-color');
+        const categoryEl = document.getElementById('event-category');
         
-        if (!titleEl || !dateEl || !titleEl.value || !dateEl.value) {
-            showNotification('Please fill in all required fields');
+        if (!titleEl || !dateEl || !titleEl.value.trim() || !dateEl.value) {
+            showNotification('❌ Please fill in the title and date fields');
             return;
         }
         
         const event = {
             id: currentEventId || Date.now(),
-            title: titleEl.value,
+            title: titleEl.value.trim(),
             date: dateEl.value,
             time: timeEl ? timeEl.value : '',
-            description: descriptionEl ? descriptionEl.value : '',
-            color: '#FF6B9D'
+            description: descriptionEl ? descriptionEl.value.trim() : '',
+            color: colorEl ? colorEl.value : '#FF6B9D',
+            category: categoryEl ? categoryEl.value : 'general',
+            createdAt: currentEventId ? events.find(e => e.id === currentEventId)?.createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
         
         if (currentEventId) {
             const index = events.findIndex(e => e.id === currentEventId);
             if (index !== -1) {
                 events[index] = event;
-                showNotification('Event updated successfully! ✅');
+                showNotification('✅ Event updated successfully!');
             }
         } else {
             events.push(event);
-            showNotification('Event added successfully! 🎉');
+            showNotification('🎉 Event added successfully!');
         }
         
         saveCalendarData();
         renderCalendar();
         updateEventsList();
         closeEventModal();
+        
     } catch (error) {
         console.error('❌ Error saving event:', error);
-        showNotification('Error saving event. Please try again.');
+        showNotification('❌ Error saving event. Please try again.');
     }
+}
+
+function deleteEvent(eventId) {
+    try {
+        const eventIndex = events.findIndex(e => e.id === eventId);
+        if (eventIndex !== -1) {
+            const eventTitle = events[eventIndex].title;
+            events.splice(eventIndex, 1);
+            saveCalendarData();
+            renderCalendar();
+            updateEventsList();
+            showNotification(`🗑️ Event "${eventTitle}" deleted successfully`);
+        }
+    } catch (error) {
+        console.error('❌ Error deleting event:', error);
+        showNotification('❌ Error deleting event');
+    }
+}
+
+function showDayEvents(date, dayEvents) {
+    const dateStr = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    const eventsHtml = dayEvents.map(event => `
+        <div class="day-event-item" style="border-left: 4px solid ${event.color};">
+            <div class="event-item-header">
+                <h4>${event.title}</h4>
+                <div class="event-actions">
+                    <button onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '&quot;')})" class="btn-small btn--primary">✏️ Edit</button>
+                    <button onclick="deleteEvent(${event.id})" class="btn-small btn--danger">🗑️ Delete</button>
+                </div>
+            </div>
+            <div class="event-time">${event.time ? formatTime(event.time) : 'All day'}</div>
+            ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+            <div class="event-category">${getCategoryIcon(event.category)} ${event.category}</div>
+        </div>
+    `).join('');
+    
+    const modal = document.createElement('div');
+    modal.className = 'day-events-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📅 Events for ${dateStr}</h2>
+                <button type="button" class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+            </div>
+            <div class="day-events-list">
+                ${eventsHtml}
+            </div>
+            <div class="modal-actions">
+                <button onclick="openEventModal(new Date('${date.toISOString()}'))" class="btn btn--primary">➕ Add Event for This Day</button>
+            </div>
+        </div>
+    `;
+    
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.remove();
+        }
+    });
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        general: '📅',
+        birthday: '🎂',
+        work: '💼',
+        personal: '👤',
+        health: '🏥',
+        social: '👥',
+        important: '⭐'
+    };
+    return icons[category] || '📅';
 }
 
 function updateEventsList() {
@@ -2511,8 +2761,9 @@ function updateEventsList() {
     eventsList.innerHTML = '';
     sortedEvents.forEach(event => {
         const eventElement = document.createElement('div');
-        eventElement.className = 'event-item';
+        eventElement.className = 'event-item enhanced';
         eventElement.style.borderLeftColor = event.color;
+        eventElement.style.cursor = 'pointer';
         
         const eventDate = new Date(event.date);
         const dateStr = eventDate.toLocaleDateString('en-US', { 
@@ -2522,52 +2773,22 @@ function updateEventsList() {
         });
         
         eventElement.innerHTML = `
-            <div class="event-title">${event.title}</div>
+            <div class="event-header">
+                <div class="event-title">${getCategoryIcon(event.category)} ${event.title}</div>
+                <div class="event-actions-mini">
+                    <button onclick="openEventModal(null, ${JSON.stringify(event).replace(/"/g, '&quot;')})" class="btn-tiny">✏️</button>
+                </div>
+            </div>
             <div class="event-datetime">${dateStr}${event.time ? ' at ' + formatTime(event.time) : ''}</div>
             ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
         `;
         
-        eventsList.appendChild(eventElement);
-    });
-}
-
-// Data Persistence Functions
-function saveRemindersData() {
-    try {
-        const remindersData = {
-            meals: {},
-            water: {
-                enabled: false,
-                interval: '60',
-                progress: waterProgress
-            }
-        };
-        
-        const waterToggle = document.getElementById('water-toggle');
-        const intervalSelect = document.getElementById('water-interval-select');
-        
-        if (waterToggle) remindersData.water.enabled = waterToggle.checked;
-        if (intervalSelect) remindersData.water.interval = intervalSelect.value;
-        
-        // Save meal settings
-        const mealTypes = ['breakfast', 'lunch', 'dinner'];
-        mealTypes.forEach(mealType => {
-            const toggle = document.getElementById(`${mealType}-toggle`);
-            const timeSelect = document.getElementById(`${mealType}-time`);
-            
-            if (toggle && timeSelect) {
-                remindersData.meals[mealType] = {
-                    enabled: toggle.checked,
-                    time: timeSelect.value
-                };
-            }
+        eventElement.addEventListener('click', function() {
+            openEventModal(null, event);
         });
         
-        localStorage.setItem('chutadamon_reminders', JSON.stringify(remindersData));
-        console.log('💾 Reminders data saved');
-    } catch (error) {
-        console.error('❌ Error saving reminders data:', error);
-    }
+        eventsList.appendChild(eventElement);
+    });
 }
 
 function saveGalleryData() {

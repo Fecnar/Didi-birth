@@ -2307,6 +2307,155 @@ input:checked + .slider:before {
   border-top: 1px solid var(--color-border);
 }
 
+/* Enhanced Calendar Styles */
+.event-indicator {
+    padding: 2px 4px;
+    margin: 1px 0;
+    border-radius: 3px;
+    font-size: 10px;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.event-indicator:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.more-events {
+    background: #666 !important;
+    font-style: italic;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.color-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-presets {
+    display: flex;
+    gap: 4px;
+}
+
+.color-preset {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.color-preset:hover,
+.color-preset.active {
+    border-color: var(--color-text);
+    transform: scale(1.1);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.left-actions, .right-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn--danger {
+    background: #ff4757;
+    color: white;
+}
+
+.btn--danger:hover {
+    background: #ff3838;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-tiny {
+    padding: 2px 6px;
+    font-size: 11px;
+    border: none;
+    background: var(--color-secondary);
+    color: var(--color-text);
+    border-radius: 3px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.btn-tiny:hover {
+    opacity: 1;
+}
+
+.day-event-item {
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--color-surface);
+    border-radius: 8px;
+}
+
+.event-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.event-item.enhanced {
+    transition: all 0.2s ease;
+}
+
+.event-item.enhanced:hover {
+    background: var(--color-secondary);
+    transform: translateX(4px);
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-actions-mini {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.event-item:hover .event-actions-mini {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
 /* Track Modal */
 .track-modal-content {
   display: flex;
